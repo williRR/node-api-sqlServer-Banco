@@ -7,7 +7,7 @@ export const crearCliente = async (req, res) => {
     res.status(201).json(nuevoCliente);
   } catch (error) {
     res.status(500).json({ message: "Error al crear cliente", error: error.message });
-  }
+  } 
 };
 
 export const obtenerCliente = async (req, res) => {

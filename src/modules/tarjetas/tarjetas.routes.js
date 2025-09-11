@@ -1,4 +1,4 @@
-import {    Router} from 'express';
+import { Router} from 'express';
 import * as tarjetasController from './tarjetas.controller.js';
 
 const router = Router();
