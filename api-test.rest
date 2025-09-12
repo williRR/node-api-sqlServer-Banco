@@ -1,0 +1,109 @@
+### ==============================
+### CLIENTES
+### ==============================
+
+# Obtener cliente por ID
+GET http://localhost:3000/api/v1/cliente/102
+Content-Type: application/json
+
+###
+
+# Crear cliente
+POST http://localhost:3000/api/v1/cliente/
+Content-Type: application/json
+
+{
+  "paterno": "Ramírez",
+  "materno": "Vásquez",
+  "nombre": "Elena",
+  "dni": "101010101013",
+  "nacimiento": "1978-02-28",
+  "ciudad": "Izabal",
+  "direccion": "Barrio El Estor, Calle 15",
+  "telefono": "78901234",
+  "email": "elena.r@example.com"
+}
+
+###
+
+# Actualizar cliente
+PUT http://localhost:3000/api/v1/cliente/102
+Content-Type: application/json
+
+{
+  "nombre": "Elena Sofía",
+  "direccion": "Avenida 20, 15-30, Zona 10"
+}
+
+---
+
+### ==============================
+### NEGOCIOS
+### ==============================
+
+# Crear negocio
+POST http://localhost:3000/api/v1/negocio/
+Content-Type: application/json
+
+{
+  "nombre": "Café El Gato Feliz",
+  "nit": "852147963-1",
+  "ciudad": "Ciudad de Guatemala",
+  "direccion": "4a Avenida, 2-10, Zona 1",
+  "telefono": "23456789",
+  "email": "contacto@elgatofeliz.com"
+}
+
+###
+
+# Actualizar negocio
+PUT http://localhost:3000/api/v1/negocio/2001
+Content-Type: application/json
+
+{
+  "nombre": "Café El Gato Feliz S.A.",
+  "direccion": "4a Avenida, 2-15, Zona 1",
+  "email": "administracion@elgatofeliz.com"
+}
+
+---
+
+### ==============================
+### CUENTAS
+### ==============================
+
+# Crear cuenta
+POST http://localhost:3000/api/v1/cuenta/
+Content-Type: application/json
+
+{
+  "monedaId": "01",
+  "sucursalId": "001",
+  "empleadoId": 101,
+  "clienteId": 115,
+  "saldoInicial": 2000.50
+}
+
+###
+
+# Actualizar estado de cuenta
+PUT http://localhost:3000/api/v1/cuenta/210103
+Content-Type: application/json
+
+{
+  "estado": "inactiva"
+}
+
+---
+
+### ==============================
+### TARJETAS
+### ==============================
+
+# Crear tarjeta asociada a cuenta
+POST http://localhost:3000/api/v1/tarjeta/
+Content-Type: application/json
+
+{
+  "cuencodigo": 210105
+}
