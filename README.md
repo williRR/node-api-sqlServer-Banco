@@ -16,9 +16,9 @@ npm install
 
 # Configurar variables de entorno
 
-## Crear un archivo .env en la raíz del proyecto.
+Crear un archivo .env en la raíz del proyecto.
 
-## Copiar las variables de ejemplo desde .env 
+Copiar las variables de ejemplo desde .env 
 
 ```bash
 PORT =  3000
@@ -37,10 +37,10 @@ npm run dev
 
 # Probar los endpoints fácilmente
 
-## Para probar los endpoints sin necesidad de Postman:
+Para probar los endpoints sin necesidad de Postman:
 
-## Instalar la extensión REST Client en Visual Studio Code
+Instalar la extensión REST Client en Visual Studio Code
 
-## Abrir el archivo api-test.http incluido en este repositorio.
+Abrir el archivo api-test.http incluido en este repositorio.
 
-## Dar clic en "Send Request" sobre el endpoint que quieras probar (ejemplo: clientes, negocios, cuentas, tarjetas).
+Dar clic en "Send Request" sobre el endpoint que quieras probar (ejemplo: clientes, negocios, cuentas, tarjetas).
