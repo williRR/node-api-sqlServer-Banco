@@ -1,8 +1,11 @@
 // modules/transacciones/transacciones.routes.js
-const controller = require('./transacciones.controller');
-const router = require('express').Router();
+import controller from './transacciones.controller.js'; // Importa el objeto { autorizarPago }
+import { Router } from 'express';
 
-// Endpoint que la Pasarela de Pago llamar para autorizar un dbito
-router.post('/autorizar', controller.autorizarPago); 
+const router = Router();
 
-module.exports = router;
+// Endpoint que la Pasarela de Pago llamará para autorizar un débito
+// Funciona porque 'controller' es el objeto exportado por defecto
+router.post('/autorizar', controller.autorizarPago);
+
+export default router;

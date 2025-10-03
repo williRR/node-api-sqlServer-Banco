@@ -1,18 +1,20 @@
-// modules/transacciones/transacciones.service.js
-const sql = require('mssql'); 
-const dbConfig = require('../../config/db'); // Asumiendo que la configuracin de conexin est aqu
+import sql from 'mssql'; 
+const { VarChar } = sql; // Desestructuramos las propiedades del objeto 'sql'
+import { dbSettings } from '../../config/db.js';   
 
-exports.procesarAutorizacion = async (tarjeta, monto, emplcodigo = 100, tipocodigo = 2) => {
+
+// Exportación con nombre de la función principal
+export const procesarAutorizacion = async (tarjeta, monto, emplcodigo = 100, tipocodigo = 2) => {
     try {
-        const pool = await sql.connect(dbConfig);
+        const pool = await sql.connect(dbSettings);
         
         const request = pool.request();
         
         // Definir variables de salida del SP
-        request.output('resultado', sql.VarChar(15));
-        request.output('mensaje', sql.VarChar(50));
+        request.output('resultado', VarChar(15));
+        request.output('mensaje', VarChar(50));
         
-        // Ejecucin del SP sp_ejecutarDebito
+        // Ejecución del SP sp_ejecutarDebito
         await request.execute('sp_ejecutarDebito', {
             tarjcodigo: tarjeta,
             monto: monto,
@@ -31,8 +33,10 @@ exports.procesarAutorizacion = async (tarjeta, monto, emplcodigo = 100, tipocodi
         };
 
     } catch (err) {
-        // Manejar errores de SQL o conexin
-        console.error('Error al ejecutar dbito:', err);
+        console.error('Error al ejecutar débito:', err);
         throw err; // Relanza el error para que lo capture el controlador
     }
 };
+
+// Exportación por defecto para facilitar la importación como objeto 'service'
+export default { procesarAutorizacion };
