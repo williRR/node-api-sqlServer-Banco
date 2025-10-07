@@ -3,7 +3,7 @@ import { dbSettings } from '../../config/db.js';
 
 const { VarChar, Decimal } = sql;
 
-export const procesarAutorizacion = async (tarjeta, monto) => {
+export const procesarAutorizacion = async (tarjeta, monto, tarjfecha, tarjcvv) => {
   let pool;
 
   try {
@@ -13,7 +13,8 @@ export const procesarAutorizacion = async (tarjeta, monto) => {
     // Entradas
     request.input('tarjcodigo', VarChar(16), tarjeta);
     request.input('monto', Decimal(18, 2), monto);
-
+    request.input('tarjfecha', VarChar(5), tarjfecha); // Esto ya estaba, solo verificamos
+    request.input('tarjcvv', VarChar(4), tarjcvv);  
     // Salidas
     request.output('resultado', VarChar(15));
     request.output('mensaje', VarChar(100));

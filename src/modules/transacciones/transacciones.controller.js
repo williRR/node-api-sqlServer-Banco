@@ -5,21 +5,23 @@ import service from './transacciones.service.js';
 const autorizarPago = async (req, res) => {
     try {
         // 🚨 Desestructuracin correcta
-        const { tarjcodigo, monto } = req.body; 
+        const { tarjcodigo, monto ,tarjfecha, tarjcvv} = req.body; 
         
  
 
         // Validacin
-        if (!tarjcodigo || !monto) {
+        if (!tarjcodigo || !monto || !tarjfecha || !tarjcvv) {
             return res.status(400).json({ 
                 status: 'RECHAZADO', 
-                mensaje: 'Faltan parmetros requeridos (tarjcodigo, monto).'
+                mensaje: 'Faltan parmetros requeridos (tarjcodigo, monto, tarjfecha, tarjcvv).'
             });
         }
 
         const resultado = await service.procesarAutorizacion(
             tarjcodigo, // Usamos la variable declarada arriba
-            monto
+            monto,
+            tarjfecha,
+            tarjcvv
         );
         
         // Manejo de respuesta
