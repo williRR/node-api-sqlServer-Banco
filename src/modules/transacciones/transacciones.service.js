@@ -1,42 +1,40 @@
-import sql from 'mssql'; 
-const { VarChar } = sql; // Desestructuramos las propiedades del objeto 'sql'
-import { dbSettings } from '../../config/db.js';   
+import sql from 'mssql';
+import { dbSettings } from '../../config/db.js';
 
+const { VarChar, Decimal } = sql;
 
-// Exportación con nombre de la función principal
-export const procesarAutorizacion = async (tarjeta, monto, emplcodigo = 100, tipocodigo = 2) => {
-    try {
-        const pool = await sql.connect(dbSettings);
-        
-        const request = pool.request();
-        
-        // Definir variables de salida del SP
-        request.output('resultado', VarChar(15));
-        request.output('mensaje', VarChar(50));
-        
-        // Ejecución del SP sp_ejecutarDebito
-        await request.execute('sp_ejecutarDebito', {
-            tarjcodigo: tarjeta,
-            monto: monto,
-            emplcodigo: emplcodigo, 
-            tipocodigo: tipocodigo  
-        });
+export const procesarAutorizacion = async (tarjeta, monto) => {
+  let pool;
 
-        // Obtener variables de salida
-        const resultado = request.parameters.resultado.value;
-        const mensaje = request.parameters.mensaje.value;
+  try {
+    pool = await sql.connect(dbSettings);
+    const request = pool.request();
 
-        // Devolver la respuesta al controlador
-        return {
-            status: resultado, // 'APROBADO', 'RECHAZADO', 'FALLIDO'
-            mensaje: mensaje
-        };
+    // Entradas
+    request.input('tarjcodigo', VarChar(16), tarjeta);
+    request.input('monto', Decimal(18, 2), monto);
 
-    } catch (err) {
-        console.error('Error al ejecutar débito:', err);
-        throw err; // Relanza el error para que lo capture el controlador
-    }
+    // Salidas
+    request.output('resultado', VarChar(15));
+    request.output('mensaje', VarChar(100));
+
+    // Ejecutar SP
+    const resultSP = await request.execute('sp_ejecutarDebito');
+
+    // Leer salidas
+    return {
+      status: resultSP.output.resultado || 'RECHAZADO',
+      mensaje: resultSP.output.mensaje || 'Respuesta no proporcionada por el SP.',
+    };
+  } catch (err) {
+    console.error('💥 Error SQL al ejecutar débito:', err.message);
+    return {
+      status: 'RECHAZADO',
+      mensaje: 'Error de ejecución en el banco. Transacción fallida.',
+    };
+  } finally {
+    if (pool) await pool.close();
+  }
 };
 
-// Exportación por defecto para facilitar la importación como objeto 'service'
 export default { procesarAutorizacion };

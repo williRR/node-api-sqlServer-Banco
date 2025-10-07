@@ -1,29 +1,44 @@
-// modules/transacciones/transacciones.controller.js
-import service from './transacciones.service.js'; // Importa el objeto { procesarAutorizacion }
+// modules/transacciones/transacciones.controller.js (Banco Ficticio)
 
-// Exportación con nombre para la función del controlador
+import service from './transacciones.service.js'; 
+
 const autorizarPago = async (req, res) => {
     try {
-        const { tarjeta, monto, emplcodigo, tipocodigo } = req.body; 
+        // 🚨 Desestructuracin correcta
+        const { tarjcodigo, monto } = req.body; 
+        
+ 
 
-        if (!tarjeta || !monto) {
-            return res.status(400).json({ status: 'RECHAZADO', mensaje: 'Faltan parámetros requeridos (tarjeta, monto).' });
+        // Validacin
+        if (!tarjcodigo || !monto) {
+            return res.status(400).json({ 
+                status: 'RECHAZADO', 
+                mensaje: 'Faltan parmetros requeridos (tarjcodigo, monto).'
+            });
         }
 
-        // Llama al servicio a través de la importación por defecto
-        const resultado = await service.procesarAutorizacion(tarjeta, monto, emplcodigo, tipocodigo);
+        const resultado = await service.procesarAutorizacion(
+            tarjcodigo, // Usamos la variable declarada arriba
+            monto
+        );
         
+        // Manejo de respuesta
         if (resultado.status === 'APROBADO') {
             return res.status(200).json(resultado);
         } else {
             return res.status(400).json(resultado); 
         }
 
-    } catch (error) {
-        console.error('Error en el controlador de autorización:', error);
-        res.status(500).json({ status: 'FALLIDO', mensaje: 'Error interno del servidor del banco.' });
+    } catch (error) { 
+        // Si hay un error, el log en el Banco muestra el trace SQL/JS
+        console.error('Error interno del Banco al procesar SP:', error);
+        
+        // Devolvemos el 500 para indicar que el servidor fall.
+        res.status(500).json({ 
+            status: 'FALLIDO', 
+            mensaje: 'Error interno del servidor del banco. Revise el log del servidor.'
+        });
     }
 };
 
-// Exportación por defecto para que las rutas puedan usar 'controller.autorizarPago'
 export default { autorizarPago };

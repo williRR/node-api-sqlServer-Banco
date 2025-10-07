@@ -35,7 +35,7 @@ Content-Type: application/json
   "direccion": "Avenida 20, 15-30, Zona 10"
 }
 
----
+
 
 ### ==============================
 ### NEGOCIOS
@@ -66,7 +66,7 @@ Content-Type: application/json
   "email": "administracion@elgatofeliz.com"
 }
 
----
+
 
 ### ==============================
 ### CUENTAS
@@ -80,9 +80,10 @@ Content-Type: application/json
   "monedaId": "01",
   "sucursalId": "001",
   "empleadoId": 101,
-  "clienteId": 115,
+  "clienteId": 110,
   "saldoInicial": 2000.50
 }
+
 
 ###
 
@@ -105,5 +106,5 @@ POST http://localhost:3000/api/v1/tarjeta/
 Content-Type: application/json
 
 {
-  "cuencodigo": 210105
+  "cuencodigo": 210104
 }

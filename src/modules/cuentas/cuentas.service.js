@@ -10,8 +10,8 @@ export const crearCuenta = async (data) => {
       .input("monecodigo", sql.VarChar(2), data.monedaId)
       .input("sucucodigo", sql.VarChar(3), data.sucursalId)
       .input("emplcreacuenta", sql.Int, data.empleadoId)
-      .input("cliecodigo", sql.Int, data.clienteId)
-      .input("negocodigo", sql.Int, data.negocioId)
+      .input("cliecodigo", sql.Int, data.clienteId ?? null) // Default to null if undefined
+      .input("negocodigo", sql.Int, data.negocioId ?? null) // Default to null if undefined
       .input("cuensaldo", sql.Decimal(18, 2), data.saldoInicial)
       .execute("sp_crearCuenta");
 
