@@ -33,6 +33,7 @@ const autorizarPago = async (req, res) => {
       Number(monto),
       tarjfecha,
       tarjcvv,
+      'BANCO_INTERNO', // Merchant ID para transacciones internas
       emplcodigo,
       tipocodigo
     );

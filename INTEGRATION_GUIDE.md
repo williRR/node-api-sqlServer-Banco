@@ -162,14 +162,6 @@ Merchant ID: STORE_001_FASHION
 - ⚡ **Carga rápida**
 - 💳 **Validación en tiempo real**
 
-## 🆘 **Soporte**
-
-¿Necesitas ayuda? Contáctanos:
-
-- 📧 Email: soporte@bancowgt.com
-- 📞 Teléfono: +502 2345-6789
-- 💬 Chat: [bancowgt.com/chat](https://bancowgt.com/chat)
-- 📚 Documentación: [docs.bancowgt.com](https://docs.bancowgt.com)
 
 ## 🔄 **API REST (Avanzado)**
 

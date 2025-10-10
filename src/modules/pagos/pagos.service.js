@@ -61,7 +61,7 @@ const updateTransactionStatus = async ({ transactionId, status, message, cuentaR
 /**
  * Procesa la autorización de un pago directo usando sp_autorizarPago
  */
-const procesarAutorizacion = async (tarjcodigo, monto, tarjfecha, tarjcvv, emplcodigo = 100, tipocodigo = 2) => {
+const procesarAutorizacion = async (tarjcodigo, monto, tarjfecha, tarjcvv, merchantid, emplcodigo = 100, tipocodigo = 2) => {
   try {
     const pool = await getConnection();
     const request = pool.request();
@@ -71,6 +71,7 @@ const procesarAutorizacion = async (tarjcodigo, monto, tarjfecha, tarjcvv, emplc
     request.input('monto', sql.Decimal(18, 2), monto);
     request.input('tarjfecha', sql.VarChar(5), tarjfecha);
     request.input('tarjcvv', sql.VarChar(4), tarjcvv);
+    request.input('merchantid', sql.VarChar(50), merchantid); // 🆕 Agregar merchantId
     request.input('emplcodigo', sql.Int, emplcodigo);
     request.input('tipocodigo', sql.Int, tipocodigo);
     
@@ -116,7 +117,7 @@ const processPaymentGateway = async ({ merchantId, amount, cardNumber, expDate, 
     pasarelaTxId = await registerInitialTransaction({ merchantId, amount, cardNumber });
 
     // 2️⃣ Llamada al banco usando sp_autorizarPago con validaciones completas
-    const bankResponse = await procesarAutorizacion(cardNumber, amount, expDate, cvv, 100, 2);
+    const bankResponse = await procesarAutorizacion(cardNumber, amount, expDate, cvv, merchantId, 100, 2);
 
     // 3️⃣ Mapear estado del banco a interno
     const statusMap = {
