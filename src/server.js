@@ -21,7 +21,7 @@ const app = express();
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        'https://banco-gt-api.fly.dev',
+        'https://banco-gt-api-aa7d620b23f8.herokuapp.com',
         'https://banco-gt-api-aa7d620b23f8.herokuapp.com',
         'https://banco-gt-api.herokuapp.com',
         /\.herokuapp\.com$/, // Permitir subdominios de Heroku

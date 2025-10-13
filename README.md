@@ -57,7 +57,7 @@ En la pestaña "Settings" → "Config Vars", agrega:
 3. Espera a que termine el build
 
 ### 🎯 **URLs de tu aplicación:**
-### Heroku
+### Fly.io (Backup/Alternativo)
 - **API:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com`
 - **Widget Demo:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com/demo.html`
 - **Panel Negocio:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com/business-demo.html`

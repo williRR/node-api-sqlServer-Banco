@@ -269,14 +269,14 @@ Content-Type: application/json
 ### PRODUCCIÓN - Fly.io (Backup)
 ### ==============================
 
-# Health check en Fly.io
-GET https://banco-gt-api.fly.dev/api/v1/widget/version
+# Health check en Heroku (backup)
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/widget/version
 Content-Type: application/json
 
 ###
 
-# Procesar pago en Fly.io
-POST https://banco-gt-api.fly.dev/api/v1/pagos/charge
+# Procesar pago en Heroku (backup)
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
 Content-Type: application/json
 
 {
