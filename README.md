@@ -39,11 +39,11 @@ En la pestaña "Settings" → "Config Vars", agrega:
 
 | Key | Value |
 |-----|-------|
-| `NODE_ENV` | `production` |
-| `DB_SERVER` | `bancogt.database.windows.net` |
+| `NODE_ENV` | `` |
+| `DB_SERVER` | `.windows.net` |
 | `DB_DATABASE` | `Banco` |
-| `DB_USER` | `sqladmin` |
-| `DB_PASSWORD` | `Willi04.` |
+| `DB_USER` | `` |
+| `DB_PASSWORD` | `` |
 
 #### 5. **Habilitar Deploy Automático:**
 1. En la pestaña "Deploy"
