@@ -3,7 +3,9 @@ const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
         'https://banco-gt-api.fly.dev',
-        'https://tu-sitio.com', // Agregar dominios permitidos
+        'https://banco-gt-api-40bb6f978e48.herokuapp.com',
+        'https://banco-gt-api.herokuapp.com',
+        /\.herokuapp\.com$/, // Permitir subdominios de Heroku
         /\.fly\.dev$/, // Permitir subdominios de fly.dev
       ]
     : '*', // En desarrollo permitir todo

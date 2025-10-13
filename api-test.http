@@ -191,27 +191,98 @@ Content-Type: application/json
 ###
 
 ### ==============================
-### PRODUCCIÓN - Fly.io
+### PRODUCCIÓN - Heroku
 ### ==============================
 
-# Health check en producción
+# Health check en Heroku
+GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/widget/version
+Content-Type: application/json
+
+###
+
+# Procesar pago con tarjeta en Heroku
+POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": "STORE_001_FASHION",
+  "cardNumber": "4000007714144690",
+  "amount": 75.50,
+  "expDate": "12/26",
+  "cvv": "123"
+}
+
+###
+
+# Generar orden de pago en Heroku
+POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/generar-orden
+Content-Type: application/json
+
+{
+  "monto": 250.00,
+  "concepto": "Pago de factura #FAC-2024-001",
+  "vigenciaHoras": 48
+}
+
+###
+
+# Ver saldo de cliente en Heroku
+GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/110/saldo
+Content-Type: application/json
+
+###
+
+# Dashboard de negocio en Heroku
+GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/dashboard
+Content-Type: application/json
+
+###
+
+# Ver órdenes pendientes en Heroku
+GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=10
+Content-Type: application/json
+
+###
+
+# Realizar transferencia en Heroku
+POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/transferir
+Content-Type: application/json
+
+{
+  "cuentaDestino": 210105,
+  "monto": 100.00,
+  "concepto": "Transferencia de prueba desde Heroku"
+}
+
+###
+
+# Pagar orden en Heroku
+POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/pagar-orden
+Content-Type: application/json
+
+{
+  "codigoOrden": "ORD1234567",
+  "claveAcceso": "8852"
+}
+
+### ==============================
+### PRODUCCIÓN - Fly.io (Backup)
+### ==============================
+
+# Health check en Fly.io
 GET https://banco-gt-api.fly.dev/api/v1/widget/version
 Content-Type: application/json
 
 ###
 
-# Saldo de cliente en producción
-GET https://banco-gt-api.fly.dev/api/v1/cliente/110/saldo
-Content-Type: application/json
-
-###
-
-# Generar orden en producción
-POST https://banco-gt-api.fly.dev/api/v1/negocio/2001/generar-orden
+# Procesar pago en Fly.io
+POST https://banco-gt-api.fly.dev/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "monto": 150.00,
-  "concepto": "Pago de factura #001234",
-  "vigenciaHoras": 48
+  "merchantId": "STORE_001_FASHION",
+  "cardNumber": "4000007714144690",
+  "amount": 75.50,
+  "expDate": "12/26",
+  "cvv": "123"
 }
