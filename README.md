@@ -57,9 +57,11 @@ En la pestaña "Settings" → "Config Vars", agrega:
 3. Espera a que termine el build
 
 ### 🎯 **URLs de tu aplicación:**
-- **🌐 API:** `https://tu-app-name.herokuapp.com`
-- **💳 Widget Demo:** `https://tu-app-name.herokuapp.com/demo.html`
-- **🏢 Panel Negocio:** `https://tu-app-name.herokuapp.com/business-demo.html`
+### Heroku
+- **API:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com`
+- **Widget Demo:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com/demo.html`
+- **Panel Negocio:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com/business-demo.html`
+- **Widget JS:** `https://banco-gt-api-aa7d620b23f8.herokuapp.com/widget/banco-payment-widget.js`
 
 ## ✨ **Beneficios del Deploy Automático:**
 - ✅ **Push to Deploy:** Cada `git push` actualiza automáticamente
@@ -82,12 +84,12 @@ git push origin main
 
 ### **Health Check:**
 ```bash
-curl https://tu-app.herokuapp.com/api/v1/widget/version
+curl https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/widget/version
 ```
 
 ### **Procesar Pago:**
 ```bash
-curl -X POST https://tu-app.herokuapp.com/api/v1/pagos/charge \
+curl -X POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge \
   -H "Content-Type: application/json" \
   -d '{
     "merchantId": "DEMO_STORE",

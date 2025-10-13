@@ -195,13 +195,13 @@ Content-Type: application/json
 ### ==============================
 
 # Health check en Heroku
-GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/widget/version
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/widget/version
 Content-Type: application/json
 
 ###
 
 # Procesar pago con tarjeta en Heroku
-POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
 Content-Type: application/json
 
 {
@@ -215,7 +215,7 @@ Content-Type: application/json
 ###
 
 # Generar orden de pago en Heroku
-POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/generar-orden
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/generar-orden
 Content-Type: application/json
 
 {
@@ -227,25 +227,25 @@ Content-Type: application/json
 ###
 
 # Ver saldo de cliente en Heroku
-GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/110/saldo
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/110/saldo
 Content-Type: application/json
 
 ###
 
 # Dashboard de negocio en Heroku
-GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/dashboard
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/dashboard
 Content-Type: application/json
 
 ###
 
 # Ver órdenes pendientes en Heroku
-GET https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=10
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=10
 Content-Type: application/json
 
 ###
 
 # Realizar transferencia en Heroku
-POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/transferir
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102/transferir
 Content-Type: application/json
 
 {
@@ -257,7 +257,7 @@ Content-Type: application/json
 ###
 
 # Pagar orden en Heroku
-POST https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/pagar-orden
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102/pagar-orden
 Content-Type: application/json
 
 {

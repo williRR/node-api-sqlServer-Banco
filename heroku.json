@@ -2,7 +2,7 @@
   "name": "Banco GT API - Sistema Bancario Completo",
   "description": "API REST completa con widget de pagos, dashboard para negocios y funcionalidades bancarias. Lista para producción.",
   "repository": "https://github.com/tu-usuario/banco-gt-api",
-  "logo": "https://banco-gt-api.herokuapp.com/assets/logo.png",
+  "logo": "https://banco-gt-api-aa7d620b23f8.herokuapp.com/assets/logo.png",
   "success_url": "/business-demo.html",
   "keywords": [
     "banco", "api", "pagos", "widget", "fintech", "nodejs", "sql-server", "guatemala"

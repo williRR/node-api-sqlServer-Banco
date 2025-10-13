@@ -1,11 +1,23 @@
 {
   "info": {
-    "name": "Banco GT API - Heroku",
+    "name": "Banco GT API - Heroku Production",
     "description": "API completa del sistema bancario GT desplegado en Heroku",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_id": "banco-gt-api-heroku",
-    "updatedAt": "2024-10-13T00:00:00.000Z"
+    "_postman_id": "banco-gt-api-heroku-prod",
+    "updatedAt": "2024-10-13T21:50:00.000Z"
   },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://banco-gt-api-aa7d620b23f8.herokuapp.com",
+      "type": "string"
+    },
+    {
+      "key": "api_version",
+      "value": "v1",
+      "type": "string"
+    }
+  ],
   "item": [
     {
       "name": "🔍 Health Check & Info",
@@ -15,12 +27,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/widget/version",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "widget", "version"]
-            },
+            "url": "{{base_url}}/api/{{api_version}}/widget/version",
             "description": "Verificar que la API esté funcionando y obtener información de versión"
           }
         },
@@ -29,290 +36,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": [""]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "👥 Clientes",
-      "item": [
-        {
-          "name": "Obtener Cliente por ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", "102"]
-            }
-          }
-        },
-        {
-          "name": "Crear Cliente",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"paterno\": \"García\",\n  \"materno\": \"López\",\n  \"nombre\": \"Carlos\",\n  \"dni\": \"123456789012\",\n  \"nacimiento\": \"1990-05-15\",\n  \"ciudad\": \"Guatemala\",\n  \"direccion\": \"Zona 1, Ciudad de Guatemala\",\n  \"telefono\": \"50212345\",\n  \"email\": \"carlos.garcia@example.com\"\n}"
-            },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", ""]
-            }
-          }
-        },
-        {
-          "name": "Ver Saldo del Cliente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/110/saldo",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", "110", "saldo"]
-            }
-          }
-        },
-        {
-          "name": "Ver Movimientos del Cliente",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/110/movimientos?limite=10&pagina=1",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", "110", "movimientos"],
-              "query": [
-                {
-                  "key": "limite",
-                  "value": "10"
-                },
-                {
-                  "key": "pagina",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Realizar Transferencia",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"cuentaDestino\": 210105,\n  \"monto\": 100.00,\n  \"concepto\": \"Transferencia de prueba\"\n}"
-            },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/transferir",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", "102", "transferir"]
-            }
-          }
-        },
-        {
-          "name": "Pagar Orden de Pago",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"codigoOrden\": \"ORD1234567\",\n  \"claveAcceso\": \"8852\"\n}"
-            },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/cliente/102/pagar-orden",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "cliente", "102", "pagar-orden"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "🏢 Negocios",
-      "item": [
-        {
-          "name": "Crear Negocio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Restaurante El Buen Sabor\",\n  \"nit\": \"123456789-1\",\n  \"ciudad\": \"Antigua Guatemala\",\n  \"direccion\": \"5a Avenida Norte, Antigua Guatemala\",\n  \"telefono\": \"78321456\",\n  \"email\": \"contacto@elbuensabor.com\"\n}"
-            },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", ""]
-            }
-          }
-        },
-        {
-          "name": "Dashboard del Negocio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/dashboard",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", "2001", "dashboard"]
-            }
-          }
-        },
-        {
-          "name": "Generar Orden de Pago",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"monto\": 250.00,\n  \"concepto\": \"Pago de factura #FAC-2024-001\",\n  \"vigenciaHoras\": 48\n}"
-            },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/generar-orden",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", "2001", "generar-orden"]
-            }
-          }
-        },
-        {
-          "name": "Ver Órdenes Generadas - Todas",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/ordenes?limite=20",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", "2001", "ordenes"],
-              "query": [
-                {
-                  "key": "limite",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Ver Órdenes - Solo Pendientes",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=20",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", "2001", "ordenes"],
-              "query": [
-                {
-                  "key": "estado",
-                  "value": "PENDIENTE"
-                },
-                {
-                  "key": "limite",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Ver Ingresos del Negocio",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/negocio/2001/ingresos?limite=20",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "negocio", "2001", "ingresos"],
-              "query": [
-                {
-                  "key": "limite",
-                  "value": "20"
-                }
-              ]
-            }
+            "url": "{{base_url}}/"
           }
         }
       ]
@@ -321,7 +45,7 @@
       "name": "💳 Pasarela de Pagos",
       "item": [
         {
-          "name": "Procesar Pago con Tarjeta - Visa",
+          "name": "Procesar Pago - Visa exitoso",
           "request": {
             "method": "POST",
             "header": [
@@ -334,12 +58,7 @@
               "mode": "raw",
               "raw": "{\n  \"merchantId\": \"STORE_001_FASHION\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 75.50,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"123\"\n}"
             },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "pagos", "charge"]
-            }
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
           }
         },
         {
@@ -356,12 +75,7 @@
               "mode": "raw",
               "raw": "{\n  \"merchantId\": \"RESTAURANT_GT_001\",\n  \"cardNumber\": \"5555555555554444\",\n  \"amount\": 125.00,\n  \"expDate\": \"08/25\",\n  \"cvv\": \"456\"\n}"
             },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "pagos", "charge"]
-            }
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
           }
         },
         {
@@ -378,16 +92,29 @@
               "mode": "raw",
               "raw": "{\n  \"merchantId\": \"ELECTRONICS_STORE\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 1500.00,\n  \"expDate\": \"03/27\",\n  \"cvv\": \"789\"\n}"
             },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "pagos", "charge"]
-            }
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Negocios",
+      "item": [
+        {
+          "name": "Dashboard del Negocio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/{{api_version}}/negocio/2001/dashboard"
           }
         },
         {
-          "name": "Pago que Falla - Tarjeta Inválida",
+          "name": "Generar Orden de Pago",
           "request": {
             "method": "POST",
             "header": [
@@ -398,73 +125,103 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchantId\": \"TEST_STORE\",\n  \"cardNumber\": \"1111111111111111\",\n  \"amount\": 50.00,\n  \"expDate\": \"12/24\",\n  \"cvv\": \"000\"\n}"
+              "raw": "{\n  \"monto\": 250.00,\n  \"concepto\": \"Pago de factura #FAC-2024-001\",\n  \"vigenciaHoras\": 48\n}"
             },
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/api/v1/pagos/charge",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["api", "v1", "pagos", "charge"]
-            }
+            "url": "{{base_url}}/api/{{api_version}}/negocio/2001/generar-orden"
+          }
+        },
+        {
+          "name": "Ver Órdenes Pendientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/{{api_version}}/negocio/2001/ordenes?estado=PENDIENTE&limite=10"
+          }
+        },
+        {
+          "name": "Ver Todas las Órdenes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/{{api_version}}/negocio/2001/ordenes?limite=20"
           }
         }
       ]
     },
     {
-      "name": "🎨 Widget & Demos",
+      "name": "👥 Clientes",
       "item": [
         {
-          "name": "Widget JavaScript",
+          "name": "Ver Saldo del Cliente",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/widget/banco-payment-widget.js",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["widget", "banco-payment-widget.js"]
-            }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/{{api_version}}/cliente/110/saldo"
           }
         },
         {
-          "name": "Demo HTML - Widget de Pago",
+          "name": "Ver Movimientos",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/demo.html",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["demo.html"]
-            }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/{{api_version}}/cliente/110/movimientos?limite=10"
           }
         },
         {
-          "name": "Demo HTML - Panel de Negocio",
+          "name": "Realizar Transferencia",
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "https://banco-gt-api-40bb6f978e48.herokuapp.com/business-demo.html",
-              "protocol": "https",
-              "host": ["banco-gt-api-40bb6f978e48", "herokuapp", "com"],
-              "path": ["business-demo.html"]
-            }
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaDestino\": 210105,\n  \"monto\": 100.00,\n  \"concepto\": \"Transferencia de prueba\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/cliente/102/transferir"
+          }
+        },
+        {
+          "name": "Pagar Orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoOrden\": \"ORD1234567\",\n  \"claveAcceso\": \"8852\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/cliente/102/pagar-orden"
           }
         }
       ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "https://banco-gt-api-40bb6f978e48.herokuapp.com",
-      "type": "string"
-    },
-    {
-      "key": "api_version",
-      "value": "v1",
-      "type": "string"
     }
   ]
 }

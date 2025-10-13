@@ -9,7 +9,7 @@ class BancoPaymentWidget {
         this.version = '1.1.0';
         this.config = {
             merchantId: config.merchantId,
-            apiUrl: config.apiUrl || 'https://banco-gt-api.herokuapp.com',
+            apiUrl: config.apiUrl || 'https://banco-gt-api-aa7d620b23f8.herokuapp.com',
             theme: config.theme || 'default',
             onSuccess: config.onSuccess || function() {},
             onError: config.onError || function() {},
