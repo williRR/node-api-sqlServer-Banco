@@ -71,7 +71,10 @@ Thumbs.db
 tmp/
 temp/
 
-Dockerfile
+# Deployment files (comentados para permitirlos si es necesario)
+# Dockerfile
+# fly.toml
 
-fly.toml
+# Lock files conflictivos
+package-lock.json
 
