@@ -1,221 +1,163 @@
 # 🏦 Banco GT API
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/tu-usuario/banco-gt-api)
+
 Sistema bancario completo con API REST y widget de pagos para integración en sitios web.
 
-## 🚀 Despliegue
+## 🚀 Despliegue Automático en Heroku
 
-### Opción 1: Heroku (Recomendado para principiantes)
-
-#### 📋 Prerrequisitos
+### 📋 Prerrequisitos
+- Cuenta en [GitHub](https://github.com)
 - Cuenta en [Heroku](https://heroku.com)
-- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) instalado
-- Base de datos SQL Server (Azure SQL Database, AWS RDS, etc.)
+- Base de datos SQL Server (Azure SQL Database recomendado)
 
-#### 🔧 Despliegue automático
+### 🔧 Configuración Paso a Paso
+
+#### 1. **Subir código a GitHub:**
 ```bash
-# Dar permisos de ejecución
-chmod +x deploy-heroku.sh
-
-# Ejecutar script de despliegue
-./deploy-heroku.sh
-```
-
-#### 🔧 Despliegue manual
-```bash
-# 1. Instalar Heroku CLI
-npm install -g heroku
-
-# 2. Login
-heroku login
-
-# 3. Crear app
-heroku create banco-gt-api
-
-# 4. Configurar variables de entorno
-heroku config:set \
-  NODE_ENV=production \
-  DB_SERVER="tu-servidor.database.windows.net" \
-  DB_DATABASE="BancoGT" \
-  DB_USER="tu-usuario" \
-  DB_PASSWORD="tu-password"
-
-# 5. Deploy
 git add .
-git commit -m "Deploy to Heroku"
-git push heroku main
+git commit -m "Proyecto Banco GT API listo para Heroku"
+git push origin main
 ```
 
-### Opción 2: Fly.io
+#### 2. **Crear app en Heroku Dashboard:**
+1. Ve a [Heroku Dashboard](https://dashboard.heroku.com)
+2. Clic en "New" → "Create new app"
+3. Nombre: `banco-gt-api` (o el que prefieras)
+4. Región: United States
+5. Clic en "Create app"
 
-#### 🔧 Despliegue
+#### 3. **Conectar con GitHub:**
+1. En tu app de Heroku, ve a la pestaña "Deploy"
+2. En "Deployment method", selecciona "GitHub"
+3. Conecta tu cuenta de GitHub
+4. Busca tu repositorio `banco-gt-api`
+5. Clic en "Connect"
+
+#### 4. **Configurar Variables de Entorno:**
+En la pestaña "Settings" → "Config Vars", agrega:
+
+| Key | Value |
+|-----|-------|
+| `NODE_ENV` | `production` |
+| `DB_SERVER` | `bancogt.database.windows.net` |
+| `DB_DATABASE` | `Banco` |
+| `DB_USER` | `sqladmin` |
+| `DB_PASSWORD` | `Willi04.` |
+
+#### 5. **Habilitar Deploy Automático:**
+1. En la pestaña "Deploy"
+2. En "Automatic deploys", selecciona la rama `main`
+3. ✅ Marca "Wait for CI to pass before deploy"
+4. Clic en "Enable Automatic Deploys"
+
+#### 6. **Deploy Manual (primera vez):**
+1. En "Manual deploy", selecciona rama `main`
+2. Clic en "Deploy Branch"
+3. Espera a que termine el build
+
+### 🎯 **URLs de tu aplicación:**
+- **🌐 API:** `https://tu-app-name.herokuapp.com`
+- **💳 Widget Demo:** `https://tu-app-name.herokuapp.com/demo.html`
+- **🏢 Panel Negocio:** `https://tu-app-name.herokuapp.com/business-demo.html`
+
+## ✨ **Beneficios del Deploy Automático:**
+- ✅ **Push to Deploy:** Cada `git push` actualiza automáticamente
+- ✅ **Rollback fácil:** Puedes volver a versiones anteriores
+- ✅ **Activity feed:** Historial completo de deploys
+- ✅ **Review apps:** Crear apps temporales para PRs
+
+## 🔄 **Flujo de trabajo típico:**
 ```bash
-# 1. Instalar flyctl
-curl -L https://fly.io/install.sh | sh
+# 1. Hacer cambios en el código
+# 2. Commitear y pushear
+git add .
+git commit -m "Mejora en el widget de pagos"
+git push origin main
 
-# 2. Login
-flyctl auth login
-
-# 3. Crear app
-flyctl apps create banco-gt-api
-
-# 4. Configurar secrets
-flyctl secrets set \
-  DB_SERVER="tu-servidor.database.windows.net" \
-  DB_DATABASE="BancoGT" \
-  DB_USER="tu-usuario" \
-  DB_PASSWORD="tu-password" \
-  NODE_ENV="production"
-
-# 5. Deploy
-flyctl deploy
+# 3. ¡Heroku automáticamente despliega! 🚀
 ```
 
-## 🎯 URLs Post-Despliegue
+## 🧪 **Testing en producción:**
 
-### Heroku
-- **API:** `https://banco-gt-api.herokuapp.com`
-- **Widget Demo:** `https://banco-gt-api.herokuapp.com/demo.html`
-- **Panel Negocio:** `https://banco-gt-api.herokuapp.com/business-demo.html`
-- **Widget JS:** `https://banco-gt-api.herokuapp.com/widget/banco-payment-widget.js`
-
-### Fly.io
-- **API:** `https://banco-gt-api.fly.dev`
-- **Widget Demo:** `https://banco-gt-api.fly.dev/demo.html`
-- **Panel Negocio:** `https://banco-gt-api.fly.dev/business-demo.html`
-- **Widget JS:** `https://banco-gt-api.fly.dev/widget/banco-payment-widget.js`
-
-## 🧪 Integración del Widget
-
-### Widget de Pago (Clientes)
-```html
-<script src="https://banco-gt-api.herokuapp.com/widget/banco-payment-widget.js"></script>
-<script>
-const paymentWidget = new BancoPaymentWidget({
-    merchantId: 'DEMO_STORE',
-    onSuccess: (result) => console.log('Pago exitoso:', result),
-    onError: (error) => console.error('Error:', error)
-});
-
-// Abrir widget con monto
-paymentWidget.open(100.00);
-</script>
+### **Health Check:**
+```bash
+curl https://tu-app.herokuapp.com/api/v1/widget/version
 ```
 
-### Panel de Negocio
-```html
-<script src="https://banco-gt-api.herokuapp.com/widget/banco-payment-widget.js"></script>
-<script>
-const businessPanel = new BancoPaymentWidget({
-    merchantId: '2001',
-    mode: 'business',
-    onSuccess: (data) => console.log('Orden generada:', data),
-    onError: (error) => console.error('Error:', error)
-});
-
-businessPanel.open();
-</script>
+### **Procesar Pago:**
+```bash
+curl -X POST https://tu-app.herokuapp.com/api/v1/pagos/charge \
+  -H "Content-Type: application/json" \
+  -d '{
+    "merchantId": "DEMO_STORE",
+    "cardNumber": "4000007714144690",
+    "amount": 100.00,
+    "expDate": "12/26",
+    "cvv": "123"
+  }'
 ```
 
-## 📊 Funcionalidades
+## 🛠️ **Comandos útiles de Heroku CLI:**
 
-### 👥 Clientes
-- ✅ Consultar saldo
-- ✅ Ver movimientos
-- ✅ Realizar transferencias
-- ✅ Pagar órdenes de pago
+```bash
+# Ver logs en vivo
+heroku logs --tail --app tu-app-name
 
-### 🏢 Negocios
-- ✅ Dashboard con estadísticas
-- ✅ Generar órdenes de pago
-- ✅ Ver órdenes generadas
-- ✅ Ver ingresos
+# Ver estado de la app
+heroku ps --app tu-app-name
 
-### 💳 Widget
-- ✅ Procesamiento de pagos
-- ✅ Panel de gestión para negocios
-- ✅ Actualizaciones automáticas
-- ✅ Múltiples temas
-- ✅ Responsive design
+# Ver variables de entorno
+heroku config --app tu-app-name
 
-## 🗃️ Base de Datos
+# Ejecutar comandos en el servidor
+heroku run node --version --app tu-app-name
 
-### Requisitos
-- SQL Server 2016 o superior
-- Azure SQL Database (recomendado)
-- AWS RDS SQL Server
-- Google Cloud SQL Server
+# Reiniciar la aplicación
+heroku restart --app tu-app-name
+```
 
-### Scripts SQL
-Ejecutar en orden:
-1. `create_orden_pago_table.sql`
-2. `sp_generarOrdenPago.sql`
-3. `sp_realizarTransferencia.sql`
-4. `sp_pagarOrdenPago.sql`
+## 📊 **Monitoreo:**
+- **📈 Métricas:** Ve a tu app en Heroku → "Metrics"
+- **📋 Logs:** Heroku Dashboard → "More" → "View logs"
+- **⚡ Performance:** Heroku → "Resources" → Ver dyno usage
 
-## 🔧 Variables de Entorno
+## 🔧 **Configuraciones adicionales:**
 
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `NODE_ENV` | Entorno de ejecución | `production` |
-| `PORT` | Puerto del servidor | `3000` |
-| `DB_SERVER` | Servidor SQL | `tu-servidor.database.windows.net` |
-| `DB_DATABASE` | Nombre de BD | `BancoGT` |
-| `DB_USER` | Usuario de BD | `tu-usuario` |
-| `DB_PASSWORD` | Contraseña de BD | `tu-password` |
+### **Escalamiento:**
+```bash
+# Escalar a 2 dynos
+heroku ps:scale web=2 --app tu-app-name
 
-## 📞 Soporte
+# Cambiar a dyno hobby (mejor performance)
+heroku ps:type hobby --app tu-app-name
+```
 
+### **Dominios personalizados:**
+```bash
+# Agregar dominio personalizado
+heroku domains:add banco-gt-api.com --app tu-app-name
+```
+
+## 🚨 **Solución de problemas:**
+
+### **Error R10 (Boot timeout):**
+- Verifica que el `PORT` use `process.env.PORT`
+- Check que `package.json` tenga el script `start` correcto
+
+### **H12 (Request timeout):**
+- Optimiza las queries de base de datos
+- Agrega timeouts adecuados
+
+### **Database connection issues:**
+- Verifica las variables de entorno en Heroku
+- Comprueba que la DB permita conexiones externas
+
+## 📞 **Soporte:**
 - 📧 Email: soporte@banco-gt.com
-- 📚 Docs: [Documentación completa](https://docs.banco-gt.com)
+- 📚 Docs Heroku: [devcenter.heroku.com](https://devcenter.heroku.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/banco-gt-api/issues)
 
-## 📄 Licencia
+---
 
-MIT License - ver [LICENSE](LICENSE) para más detalles.
-
-# Clonar el repositorio
-
-```bash
-git clone https://github.com/williRR/node-api-sqlServer-Banco 
-
-cd tu-api
-
-```
-# instalar dependencias (Node.js)
-
-```bash
-npm install
-
-
-```
-
-# Configurar variables de entorno
-
-Crear un archivo .env en la raíz del proyecto.
-
-Copiar las variables de ejemplo desde .env 
-
-```bash
-PORT =  3000
-DB_USER = "sa"
-DB_PASSWORD = "password"
-DB_SERVER = "localhost"
-DB_DATABASE = "Banco" 
-```
-
-# Ejecutar la API en modo desarrollo
-```bash
-
-npm run dev
-
-```
-
-# Probar los endpoints fácilmente
-
-Para probar los endpoints sin necesidad de Postman:
-
-Instalar la extensión REST Client en Visual Studio Code
-
-Abrir el archivo api-test.http incluido en este repositorio.
-
-Dar clic en "Send Request" sobre el endpoint que quieras probar (ejemplo: clientes, negocios, cuentas, tarjetas).
+**¡Con este setup, cada cambio que hagas se despliega automáticamente! 🎉**
