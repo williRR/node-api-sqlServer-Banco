@@ -14,6 +14,14 @@
       "value": "production",
       "required": true
     },
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Force npm install instead of npm ci",
+      "value": "false"
+    },
+    "USE_NPM_INSTALL": {
+      "description": "Use npm install instead of npm ci",
+      "value": "true"
+    },
     "DB_SERVER": {
       "description": "SQL Server hostname (ej: tu-servidor.database.windows.net)",
       "required": true

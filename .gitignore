@@ -75,6 +75,6 @@ temp/
 # Dockerfile
 # fly.toml
 
-# Lock files conflictivos
-package-lock.json
+# Lock files conflictivos (temporalmente excluido para Heroku)
+# package-lock.json
 
