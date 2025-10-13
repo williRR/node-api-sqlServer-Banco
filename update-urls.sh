@@ -42,7 +42,7 @@ git status --short
 echo ""
 echo "🚀 Comandos para deploy:"
 echo "git commit -m 'Update all URLs to new Heroku deployment'"
-echo "git push origin main"
+echo "git push origin master"
 echo ""
 
 # Opción de commit automático
@@ -51,7 +51,7 @@ read -p "¿Hacer commit y push automáticamente? (y/N): " auto_commit
 if [[ $auto_commit =~ ^[Yy]$ ]]; then
     echo "📤 Haciendo commit y push..."
     git commit -m "Update all URLs to new Heroku deployment - banco-gt-api-aa7d620b23f8.herokuapp.com"
-    git push origin main
+    git push origin master
     echo "✅ ¡Cambios subidos! Deploy automático en progreso..."
 else
     echo "⏳ Ejecuta manualmente los comandos git mostrados arriba"

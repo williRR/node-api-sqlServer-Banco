@@ -9,8 +9,8 @@
     "dev": "nodemon src/server.js",
     "build": "echo 'No build process required'",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-prebuild": "echo 'Heroku prebuild step'",
-    "heroku-postbuild": "echo 'Heroku postbuild completed'"
+    "heroku-prebuild": "npm --version && node --version",
+    "heroku-postbuild": "echo 'Build completed successfully'"
   },
   "keywords": [
     "banco",
