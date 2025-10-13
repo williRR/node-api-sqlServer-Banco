@@ -266,16 +266,22 @@ Content-Type: application/json
 }
 
 ### ==============================
-### PRODUCCIÓN - Fly.io (Backup)
+### TESTING ADICIONAL
 ### ==============================
 
-# Health check en Heroku (backup)
+# Health check adicional
 GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/widget/version
 Content-Type: application/json
 
 ###
 
-# Procesar pago en Heroku (backup)
+# Test de merchants válidos
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/merchants
+Content-Type: application/json
+
+###
+
+# Pago con merchant de base de datos
 POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
 Content-Type: application/json
 

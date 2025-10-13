@@ -71,10 +71,11 @@ Thumbs.db
 tmp/
 temp/
 
-# Deployment files (comentados para permitirlos si es necesario)
-# Dockerfile
-# fly.toml
-
 # Lock files conflictivos (temporalmente excluido para Heroku)
 # package-lock.json
+
+# Archivos de Fly.io (ya no se usan)
+Dockerfile
+fly.toml
+.dockerignore
 
