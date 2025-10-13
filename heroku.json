@@ -1,0 +1,51 @@
+{
+  "name": "Banco GT API - Sistema Bancario Completo",
+  "description": "API REST completa con widget de pagos, dashboard para negocios y funcionalidades bancarias. Lista para producción.",
+  "repository": "https://github.com/tu-usuario/banco-gt-api",
+  "logo": "https://banco-gt-api.herokuapp.com/assets/logo.png",
+  "success_url": "/business-demo.html",
+  "keywords": [
+    "banco", "api", "pagos", "widget", "fintech", "nodejs", "sql-server", "guatemala"
+  ],
+  "website": "https://banco-gt.com",
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment for Node.js",
+      "value": "production",
+      "required": true
+    },
+    "DB_SERVER": {
+      "description": "SQL Server hostname (ej: tu-servidor.database.windows.net)",
+      "required": true
+    },
+    "DB_DATABASE": {
+      "description": "Nombre de la base de datos",
+      "value": "BancoGT",
+      "required": true
+    },
+    "DB_USER": {
+      "description": "Usuario de la base de datos SQL Server",
+      "required": true
+    },
+    "DB_PASSWORD": {
+      "description": "Contraseña de la base de datos SQL Server",
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "stack": "heroku-22",
+  "addons": [],
+  "scripts": {
+    "postdeploy": "echo '🎉 Banco GT API desplegado exitosamente! Visita /business-demo.html para probar el widget.'"
+  }
+}

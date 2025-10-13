@@ -9,7 +9,7 @@ class BancoPaymentWidget {
         this.version = '1.1.0';
         this.config = {
             merchantId: config.merchantId,
-            apiUrl: config.apiUrl || 'https://banco-gt-api.fly.dev',
+            apiUrl: config.apiUrl || 'https://banco-gt-api.herokuapp.com',
             theme: config.theme || 'default',
             onSuccess: config.onSuccess || function() {},
             onError: config.onError || function() {},
@@ -33,7 +33,7 @@ class BancoPaymentWidget {
     // Verificar si hay nuevas versiones disponibles
     async checkForUpdates() {
         try {
-            const response = await fetch(`${this.config.apiUrl}/widget/version`);
+            const response = await fetch(`${this.config.apiUrl}/api/v1/widget/version`);
             const versionInfo = await response.json();
             
             if (versionInfo.version !== this.version) {

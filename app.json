@@ -1,0 +1,60 @@
+{
+  "name": "Banco GT API",
+  "description": "Sistema Bancario GT - API completa con funcionalidades para clientes y negocios",
+  "repository": "https://github.com/tu-usuario/banco-gt-api",
+  "logo": "https://banco-gt-api.fly.dev/widget/logo.png",
+  "keywords": [
+    "banco",
+    "api",
+    "pagos",
+    "guatemala",
+    "fintech",
+    "nodejs",
+    "express",
+    "mssql"
+  ],
+  "image": "heroku/nodejs",
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment for the application",
+      "value": "production"
+    },
+    "DB_SERVER": {
+      "description": "SQL Server hostname (e.g., your-server.database.windows.net)",
+      "required": true
+    },
+    "DB_DATABASE": {
+      "description": "Database name",
+      "value": "BancoGT",
+      "required": true
+    },
+    "DB_USER": {
+      "description": "Database username",
+      "required": true
+    },
+    "DB_PASSWORD": {
+      "description": "Database password",
+      "required": true
+    },
+    "PORT": {
+      "description": "Port for the application",
+      "value": "3000"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [],
+  "scripts": {
+    "postdeploy": "echo 'Deployment completed successfully!'"
+  }
+}

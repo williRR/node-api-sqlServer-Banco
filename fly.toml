@@ -1,3 +1,4 @@
+# fly.toml app configuration file generated for banco-gt-api
 app = "banco-gt-api"
 primary_region = "mia"
 
@@ -31,10 +32,3 @@ primary_region = "mia"
   memory = "1gb"
   cpu_kind = "shared"
   cpus = 1
-
-# Variables de entorno para la base de datos
-[[env]]
-  DB_SERVER = ""    # Se configurará después
-  DB_DATABASE = ""  # Se configurará después
-  DB_USER = ""      # Se configurará después  
-  DB_PASSWORD = ""  # Se configurará después
