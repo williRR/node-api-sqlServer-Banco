@@ -124,58 +124,440 @@ app.get('/', (req, res) => {
 
 // ===== RUTAS DE PAGOS =====
 
-// Procesar pago con tarjeta
-app.post('/api/v1/pagos/charge', async (req, res) => {
+// Obtener merchants válidos desde la base de datos
+app.get('/api/v1/pagos/merchants', async (req, res) => {
   try {
-    const { merchantId, cardNumber, amount, expDate, cvv } = req.body;
-
-    // Validaciones básicas
-    if (!merchantId || !cardNumber || !amount || !expDate || !cvv) {
-      return res.status(400).json({
+    const pool = await getDbPool();
+    if (!pool) {
+      return res.status(503).json({
         status: 'error',
-        message: 'Todos los campos son requeridos'
+        message: 'Base de datos no disponible',
+        fallback_merchants: [
+          { id: '2001', name: 'Comercio Demo 2001', status: 'demo' },
+          { id: '2002', name: 'Comercio Demo 2002', status: 'demo' }
+        ]
       });
     }
 
-    // Validar formato de tarjeta
-    const cardRegex = /^[0-9]{13,19}$/;
-    if (!cardRegex.test(cardNumber.replace(/\s/g, ''))) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Número de tarjeta inválido'
-      });
-    }
+    const request = pool.request();
+    const result = await request.query(`
+      SELECT NegocioID, Nombre, NIT, Ciudad, Estado, FechaCreacion
+      FROM Negocio 
+      WHERE Estado = 'Activo'
+      ORDER BY Nombre
+    `);
 
-    // Simulación de procesamiento
-    const isApproved = Math.random() > 0.1; // 90% de aprobación
-
-    if (isApproved) {
-      const transactionId = `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`;
-      
-      res.json({
-        status: 'success',
-        message: 'Pago procesado exitosamente',
-        transactionId,
-        amount,
-        merchantId,
-        timestamp: new Date().toISOString(),
-        cardLast4: cardNumber.slice(-4)
-      });
-    } else {
-      res.status(402).json({
-        status: 'error',
-        message: 'Pago rechazado. Intente con otra tarjeta.',
-        errorCode: 'CARD_DECLINED'
-      });
-    }
+    res.json({
+      status: 'success',
+      message: 'Lista de merchants afiliados activos',
+      data: {
+        merchants: result.recordset.map(merchant => ({
+          id: merchant.NegocioID.toString(),
+          name: merchant.Nombre,
+          nit: merchant.NIT,
+          city: merchant.Ciudad,
+          status: merchant.Estado,
+          created: merchant.FechaCreacion
+        })),
+        total: result.recordset.length,
+        note: 'Use el campo "id" como merchantId en los pagos'
+      }
+    });
   } catch (error) {
-    console.error('Error procesando pago:', error);
+    console.error('Error obteniendo merchants:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Error interno del servidor'
+      message: 'Error interno del servidor',
+      fallback_merchants: [
+        { id: '2001', name: 'Comercio Demo 2001', status: 'demo' },
+        { id: '2002', name: 'Comercio Demo 2002', status: 'demo' }
+      ]
     });
   }
 });
+
+// ===== ENDPOINT PRINCIPAL: PROCESAR PAGO CON TARJETA =====
+app.post('/api/v1/pagos/charge', async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    
+    console.log(`💳 Nueva solicitud de pago desde IP: ${clientIP}`);
+    
+    // Extraer datos del request
+    const { 
+      merchantId, 
+      cardNumber, 
+      amount, 
+      expDate, 
+      cvv,
+      cardHolderName,
+      billingAddress,
+      currency = 'GTQ',
+      description = 'Pago procesado por Banco GT'
+    } = req.body;
+
+    // ===== VALIDACIONES ESTRICTAS =====
+    
+    // 1. Campos requeridos
+    const requiredFields = { merchantId, cardNumber, amount, expDate, cvv };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: `Campos requeridos faltantes: ${missingFields.join(', ')}`,
+        errorCode: 'MISSING_FIELDS',
+        missingFields
+      });
+    }
+
+    // 2. Validar monto
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0 || numAmount > 50000) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Monto inválido. Debe ser mayor a 0 y menor a Q50,000',
+        errorCode: 'INVALID_AMOUNT'
+      });
+    }
+
+    // 3. Validar número de tarjeta (Luhn algorithm)
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+    if (!isValidCardNumber(cleanCardNumber)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Número de tarjeta inválido',
+        errorCode: 'INVALID_CARD_NUMBER'
+      });
+    }
+
+    // 4. Validar fecha de vencimiento
+    if (!isValidExpDate(expDate)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Fecha de vencimiento inválida o expirada',
+        errorCode: 'INVALID_EXP_DATE'
+      });
+    }
+
+    // 5. Validar CVV
+    if (!/^[0-9]{3,4}$/.test(cvv)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'CVV inválido',
+        errorCode: 'INVALID_CVV'
+      });
+    }
+
+    // 6. Validar merchantId contra la base de datos
+    try {
+      const pool = await getDbPool();
+      if (pool) {
+        const merchantRequest = pool.request();
+        merchantRequest.input('NegocioID', sql.Int, parseInt(merchantId));
+        
+        const merchantResult = await merchantRequest.query(`
+          SELECT NegocioID, Nombre, Estado 
+          FROM Negocio 
+          WHERE NegocioID = @NegocioID AND Estado = 'Activo'
+        `);
+
+        if (merchantResult.recordset.length === 0) {
+          return res.status(400).json({
+            status: 'error',
+            message: `Merchant ID no válido o inactivo: ${merchantId}`,
+            errorCode: 'INVALID_MERCHANT',
+            suggestion: 'Verifique que el NegocioID sea correcto y esté activo'
+          });
+        }
+        
+        console.log(`✅ Merchant validado: ${merchantResult.recordset[0].Nombre}`);
+      } else {
+        // Si no hay conexión a BD, permitir algunos IDs de prueba
+        const testMerchants = ['2001', '2002', 'DEMO_STORE'];
+        if (!testMerchants.includes(merchantId)) {
+          return res.status(400).json({
+            status: 'error',
+            message: `BD no disponible. Use merchant de prueba: ${testMerchants.join(', ')}`,
+            errorCode: 'DB_UNAVAILABLE_INVALID_MERCHANT'
+          });
+        }
+      }
+    } catch (dbError) {
+      console.warn('⚠️ Error validando merchant en BD:', dbError.message);
+      // En caso de error de BD, permitir algunos IDs conocidos
+      const fallbackMerchants = ['2001', '2002', 'DEMO_STORE'];
+      if (!fallbackMerchants.includes(merchantId)) {
+        return res.status(400).json({
+          status: 'error',
+          message: `Error de BD. Use merchant de prueba: ${fallbackMerchants.join(', ')}`,
+          errorCode: 'DB_ERROR_INVALID_MERCHANT'
+        });
+      }
+    }
+
+    // 7. Determinar tipo de tarjeta
+    const cardType = getCardType(cleanCardNumber);
+    
+    // ===== SIMULACIÓN DE PROCESAMIENTO =====
+    
+    console.log(`🔄 Procesando pago: ${cardType} **** ${cleanCardNumber.slice(-4)} por Q${numAmount}`);
+    
+    // Simular tiempo de procesamiento (1-3 segundos)
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000));
+    
+    // Lógica de aprobación/rechazo más realista
+    const { approved, declineReason } = simulatePaymentProcessing(cleanCardNumber, numAmount, cardType);
+    
+    if (approved) {
+      // ===== PAGO APROBADO =====
+      const transactionId = generateTransactionId();
+      const authCode = generateAuthCode();
+      const processTime = Date.now() - startTime;
+      
+      // Log de transacción exitosa
+      console.log(`✅ Pago aprobado - TXN: ${transactionId}, Tiempo: ${processTime}ms`);
+      
+      // Respuesta exitosa
+      const successResponse = {
+        status: 'success',
+        message: 'Pago procesado exitosamente',
+        data: {
+          transactionId,
+          authorizationCode: authCode,
+          merchantId,
+          amount: numAmount,
+          currency,
+          cardType,
+          cardLast4: cleanCardNumber.slice(-4),
+          timestamp: new Date().toISOString(),
+          processingTime: `${processTime}ms`,
+          description,
+          receipt: {
+            merchantName: await getMerchantName(merchantId),
+            transactionDate: new Date().toLocaleString('es-GT'),
+            reference: `REF${transactionId.slice(-8)}`
+          }
+        }
+      };
+
+      // Simular guardado en base de datos (opcional)
+      try {
+        await saveTransactionToDatabase(successResponse.data);
+      } catch (dbError) {
+        console.warn('⚠️ Error guardando en BD:', dbError.message);
+      }
+
+      return res.status(200).json(successResponse);
+      
+    } else {
+      // ===== PAGO RECHAZADO =====
+      const processTime = Date.now() - startTime;
+      
+      console.log(`❌ Pago rechazado - Razón: ${declineReason}, Tiempo: ${processTime}ms`);
+      
+      return res.status(402).json({
+        status: 'declined',
+        message: getDeclineMessage(declineReason),
+        errorCode: declineReason,
+        data: {
+          merchantId,
+          amount: numAmount,
+          cardLast4: cleanCardNumber.slice(-4),
+          timestamp: new Date().toISOString(),
+          processingTime: `${processTime}ms`
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error('💥 Error crítico procesando pago:', error);
+    
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error interno del servidor. Intente nuevamente.',
+      errorCode: 'INTERNAL_ERROR',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// ===== FUNCIONES AUXILIARES PARA PAGOS =====
+
+// Validar número de tarjeta con algoritmo de Luhn
+function isValidCardNumber(cardNumber) {
+  if (!/^[0-9]{13,19}$/.test(cardNumber)) return false;
+  
+  let sum = 0;
+  let alternate = false;
+  
+  for (let i = cardNumber.length - 1; i >= 0; i--) {
+    let digit = parseInt(cardNumber.charAt(i));
+    
+    if (alternate) {
+      digit *= 2;
+      if (digit > 9) digit = (digit % 10) + 1;
+    }
+    
+    sum += digit;
+    alternate = !alternate;
+  }
+  
+  return (sum % 10) === 0;
+}
+
+// Validar fecha de vencimiento
+function isValidExpDate(expDate) {
+  if (!/^\d{2}\/\d{2}$/.test(expDate)) return false;
+  
+  const [month, year] = expDate.split('/').map(num => parseInt(num));
+  if (month < 1 || month > 12) return false;
+  
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear() % 100;
+  const currentMonth = currentDate.getMonth() + 1;
+  
+  if (year < currentYear || (year === currentYear && month < currentMonth)) {
+    return false;
+  }
+  
+  return true;
+}
+
+// Determinar tipo de tarjeta
+function getCardType(cardNumber) {
+  const firstDigit = cardNumber.charAt(0);
+  const firstTwoDigits = cardNumber.substring(0, 2);
+  const firstFourDigits = cardNumber.substring(0, 4);
+  
+  if (firstDigit === '4') return 'VISA';
+  if (['51', '52', '53', '54', '55'].includes(firstTwoDigits)) return 'MASTERCARD';
+  if (['34', '37'].includes(firstTwoDigits)) return 'AMERICAN_EXPRESS';
+  if (firstFourDigits === '6011') return 'DISCOVER';
+  
+  return 'UNKNOWN';
+}
+
+// Simular procesamiento de pago
+function simulatePaymentProcessing(cardNumber, amount, cardType) {
+  // Tarjetas de prueba que siempre fallan
+  const testDeclinedCards = [
+    '4000000000000002', // Tarjeta genérica rechazada
+    '4000000000000127', // CVV incorrecto
+    '4000000000000069', // Tarjeta expirada
+    '1111111111111111'  // Número inválido
+  ];
+  
+  if (testDeclinedCards.includes(cardNumber)) {
+    return { approved: false, declineReason: 'CARD_DECLINED' };
+  }
+  
+  // Simular diferentes escenarios de rechazo
+  const random = Math.random();
+  
+  if (amount > 10000 && random < 0.1) {
+    return { approved: false, declineReason: 'AMOUNT_EXCEEDED' };
+  }
+  
+  if (random < 0.05) {
+    return { approved: false, declineReason: 'INSUFFICIENT_FUNDS' };
+  }
+  
+  if (random < 0.02) {
+    return { approved: false, declineReason: 'SUSPECTED_FRAUD' };
+  }
+  
+  // 93% de aprobación
+  return { approved: true, declineReason: null };
+}
+
+// Generar ID de transacción único
+function generateTransactionId() {
+  const timestamp = Date.now().toString();
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `TXN${timestamp}${random}`;
+}
+
+// Generar código de autorización
+function generateAuthCode() {
+  return Math.floor(Math.random() * 900000 + 100000).toString();
+}
+
+// Obtener nombre del comercio (ahora async para consultar BD)
+async function getMerchantName(merchantId) {
+  try {
+    const pool = await getDbPool();
+    if (pool) {
+      const request = pool.request();
+      request.input('NegocioID', sql.Int, parseInt(merchantId));
+      
+      const result = await request.query(`
+        SELECT Nombre FROM Negocio WHERE NegocioID = @NegocioID
+      `);
+      
+      if (result.recordset.length > 0) {
+        return result.recordset[0].Nombre;
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Error obteniendo nombre del merchant:', error.message);
+  }
+  
+  // Fallback para merchants conocidos
+  const fallbackMerchants = {
+    '2001': 'Comercio Demo 2001',
+    '2002': 'Comercio Demo 2002', 
+    'DEMO_STORE': 'Tienda Demo'
+  };
+  
+  return fallbackMerchants[merchantId] || `Comercio ${merchantId}`;
+}
+
+// Obtener mensaje de rechazo amigable
+function getDeclineMessage(declineReason) {
+  const messages = {
+    'CARD_DECLINED': 'Su tarjeta fue rechazada. Contacte a su banco.',
+    'INSUFFICIENT_FUNDS': 'Fondos insuficientes en su tarjeta.',
+    'AMOUNT_EXCEEDED': 'El monto excede el límite permitido.',
+    'SUSPECTED_FRAUD': 'Transacción bloqueada por seguridad. Contacte a su banco.',
+    'EXPIRED_CARD': 'Su tarjeta ha expirado.',
+    'INVALID_CVV': 'Código de seguridad incorrecto.'
+  };
+  
+  return messages[declineReason] || 'Transacción no autorizada.';
+}
+
+// Guardar transacción en base de datos (simulado)
+async function saveTransactionToDatabase(transactionData) {
+  try {
+    const pool = await getDbPool();
+    if (!pool) {
+      console.warn('⚠️ BD no disponible, transacción no guardada');
+      return;
+    }
+    
+    const request = pool.request();
+    request.input('TransactionId', sql.VarChar, transactionData.transactionId);
+    request.input('MerchantId', sql.VarChar, transactionData.merchantId);
+    request.input('Amount', sql.Decimal(10, 2), transactionData.amount);
+    request.input('CardLast4', sql.VarChar, transactionData.cardLast4);
+    request.input('CardType', sql.VarChar, transactionData.cardType);
+    request.input('AuthCode', sql.VarChar, transactionData.authorizationCode);
+    request.input('Status', sql.VarChar, 'APPROVED');
+    
+    await request.query(`
+      INSERT INTO Transacciones (TransactionId, MerchantId, Amount, CardLast4, CardType, AuthCode, Status, FechaCreacion)
+      VALUES (@TransactionId, @MerchantId, @Amount, @CardLast4, @CardType, @AuthCode, @Status, GETDATE())
+    `);
+    
+    console.log(`💾 Transacción guardada en BD: ${transactionData.transactionId}`);
+  } catch (error) {
+    console.warn('⚠️ Error guardando transacción:', error.message);
+  }
+}
 
 // ===== RUTAS DE CLIENTES =====
 

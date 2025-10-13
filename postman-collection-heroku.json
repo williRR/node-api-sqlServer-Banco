@@ -45,7 +45,7 @@
       "name": "💳 Pasarela de Pagos",
       "item": [
         {
-          "name": "Procesar Pago - Visa exitoso",
+          "name": "💳 Pago Exitoso - VISA",
           "request": {
             "method": "POST",
             "header": [
@@ -56,13 +56,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchantId\": \"STORE_001_FASHION\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 75.50,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"123\"\n}"
+              "raw": "{\n  \"merchantId\": \"STORE_001_FASHION\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 125.50,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"123\",\n  \"cardHolderName\": \"Juan Pérez\",\n  \"description\": \"Compra en Fashion Store - Orden #12345\"\n}"
             },
             "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
           }
         },
         {
-          "name": "Procesar Pago - Mastercard",
+          "name": "💳 Pago Exitoso - MASTERCARD",
           "request": {
             "method": "POST",
             "header": [
@@ -73,13 +73,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchantId\": \"RESTAURANT_GT_001\",\n  \"cardNumber\": \"5555555555554444\",\n  \"amount\": 125.00,\n  \"expDate\": \"08/25\",\n  \"cvv\": \"456\"\n}"
+              "raw": "{\n  \"merchantId\": \"RESTAURANT_GT_001\",\n  \"cardNumber\": \"5555555555554444\",\n  \"amount\": 89.75,\n  \"expDate\": \"08/25\",\n  \"cvv\": \"456\",\n  \"cardHolderName\": \"María González\",\n  \"description\": \"Pago en Restaurante Guatemala\"\n}"
             },
             "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
           }
         },
         {
-          "name": "Pago de Alto Monto",
+          "name": "💰 Pago de Alto Monto",
           "request": {
             "method": "POST",
             "header": [
@@ -90,7 +90,75 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchantId\": \"ELECTRONICS_STORE\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 1500.00,\n  \"expDate\": \"03/27\",\n  \"cvv\": \"789\"\n}"
+              "raw": "{\n  \"merchantId\": \"ELECTRONICS_STORE\",\n  \"cardNumber\": \"4111111111111111\",\n  \"amount\": 2500.00,\n  \"expDate\": \"03/27\",\n  \"cvv\": \"789\",\n  \"cardHolderName\": \"Carlos Mendoza\",\n  \"description\": \"Compra de equipo electrónico\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
+          }
+        },
+        {
+          "name": "❌ Pago Rechazado - Tarjeta Bloqueada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"SUPERMARKET_GT\",\n  \"cardNumber\": \"4000000000000002\",\n  \"amount\": 45.25,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"123\",\n  \"description\": \"Compra en supermercado - será rechazada\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
+          }
+        },
+        {
+          "name": "❌ Error de Validación - Campos Faltantes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"DEMO_STORE\",\n  \"amount\": 100.00,\n  \"expDate\": \"12/26\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
+          }
+        },
+        {
+          "name": "❌ Error - Monto Inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"DEMO_STORE\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": -50.00,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"123\"\n}"
+            },
+            "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
+          }
+        },
+        {
+          "name": "❌ Error - CVV Inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchantId\": \"DEMO_STORE\",\n  \"cardNumber\": \"4000007714144690\",\n  \"amount\": 50.00,\n  \"expDate\": \"12/26\",\n  \"cvv\": \"12\"\n}"
             },
             "url": "{{base_url}}/api/{{api_version}}/pagos/charge"
           }
