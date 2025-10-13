@@ -1,14 +1,22 @@
 import sql from "mssql";
 import { DB_DATABASE, DB_PASSWORD, DB_SERVER, DB_USER } from "../../src/config.js";
 
+// Configuración de base de datos con variables de entorno para producción
 export const dbSettings = {
-  user: DB_USER,
-  password: DB_PASSWORD,
-  server: DB_SERVER,
-  database: DB_DATABASE,
+  user: process.env.DB_USER || 'sa',
+  password: process.env.DB_PASSWORD || 'willirr123',
+  server: process.env.DB_SERVER || 'localhost',
+  database: process.env.DB_DATABASE || 'BancoGT',
   options: {
-    encrypt: true, // for azure
-    trustServerCertificate: true, // change to true for local dev / self-signed certs
+    encrypt: process.env.NODE_ENV === 'production', // Encrypt en producción
+    trustServerCertificate: process.env.NODE_ENV !== 'production',
+    connectTimeout: 30000,
+    requestTimeout: 30000,
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000,
   },
 };
 

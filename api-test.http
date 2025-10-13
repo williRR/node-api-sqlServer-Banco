@@ -38,6 +38,45 @@ Content-Type: application/json
 
 
 ### ==============================
+### CLIENTES - Nuevas funcionalidades
+### ==============================
+
+# Ver saldo del cliente
+GET http://localhost:3000/api/v1/cliente/110/saldo
+Content-Type: application/json
+
+###
+
+# Ver movimientos del cliente
+GET http://localhost:3000/api/v1/cliente/110/movimientos?limite=10&pagina=1
+Content-Type: application/json
+
+###
+
+# Realizar transferencia
+POST http://localhost:3000/api/v1/cliente/102/transferir
+Content-Type: application/json
+
+{
+  "cuentaDestino": 210105,
+  "monto": 50.00,
+  "concepto": "Pago de servicios"
+}
+
+###
+
+# Pagar orden de pago
+POST http://localhost:3000/api/v1/cliente/102/pagar-orden
+Content-Type: application/json
+
+{
+  "codigoOrden": "ORD1234567",
+  "claveAcceso": "8852"
+}
+
+
+
+### ==============================
 ### NEGOCIOS
 ### ==============================
 
@@ -46,12 +85,12 @@ POST http://localhost:3000/api/v1/negocio/
 Content-Type: application/json
 
 {
-  "nombre": "Café El Gato Feliz",
-  "nit": "852147963-1",
+  "nombre": "Soluciones digitales S.A.",
+  "nit": "852147963-2",
   "ciudad": "Ciudad de Guatemala",
   "direccion": "4a Avenida, 2-10, Zona 1",
-  "telefono": "23456789",
-  "email": "contacto@elgatofeliz.com"
+  "telefono": "599124132",
+  "email": "contacto@solucionesdigitales.com"
 }
 
 ###
@@ -69,42 +108,110 @@ Content-Type: application/json
 
 
 ### ==============================
-### CUENTAS
+### NEGOCIOS - Nuevas funcionalidades
 ### ==============================
 
-# Crear cuenta
-POST http://localhost:3000/api/v1/cuenta/
+# Dashboard del negocio
+GET http://localhost:3000/api/v1/negocio/2001/dashboard
 Content-Type: application/json
-
-{
-  "monedaId": "01",
-  "sucursalId": "001",
-  "empleadoId": 101,
-  "clienteId": 110,
-  "saldoInicial": 2000.50
-}
-
 
 ###
 
-# Actualizar estado de cuenta
-PUT http://localhost:3000/api/v1/cuenta/210103
+# Generar orden de pago
+POST http://localhost:3000/api/v1/negocio/2001/generar-orden
 Content-Type: application/json
 
 {
-  "estado": "inactiva"
+  "monto": 150.00,
+  "concepto": "Pago de factura #001234",
+  "vigenciaHoras": 48
 }
 
----
+###
+
+# Ver órdenes generadas
+GET http://localhost:3000/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=20
+Content-Type: application/json
+
+###
+
+# Ver todos las órdenes (sin filtro de estado)
+GET http://localhost:3000/api/v1/negocio/2001/ordenes?limite=20
+Content-Type: application/json
+
+###
+
+# Ver ingresos del negocio
+GET http://localhost:3000/api/v1/negocio/2001/ingresos?fechaInicio=2024-01-01&limite=50
+Content-Type: application/json
+
+###
+
+# Ver ingresos sin filtro de fecha
+GET http://localhost:3000/api/v1/negocio/2001/ingresos?limite=20
+Content-Type: application/json
 
 ### ==============================
-### TARJETAS
+### PASARELA DE PAGOS
 ### ==============================
 
-# Crear tarjeta asociada a cuenta
-POST http://localhost:3000/api/v1/tarjeta/
+# Procesar pago con tarjeta
+POST http://localhost:3000/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "cuencodigo": 210104
+  "merchantId": "STORE_001_FASHION",
+  "cardNumber": "4000007714144690",
+  "amount": 10.0,
+  "expDate": "10/30",
+  "cvv": "551"
+}
+
+###
+
+# Widget de demostración
+GET http://localhost:3000/demo.html
+
+###
+
+# Panel de Negocio - Demo
+GET http://localhost:3000/business-demo.html
+
+###
+
+# Archivo del widget
+GET http://localhost:3000/widget/banco-payment-widget.js
+
+###
+
+# Información de versión del widget
+GET http://localhost:3000/api/v1/widget/version
+Content-Type: application/json
+
+###
+
+### ==============================
+### PRODUCCIÓN - Fly.io
+### ==============================
+
+# Health check en producción
+GET https://banco-gt-api.fly.dev/api/v1/widget/version
+Content-Type: application/json
+
+###
+
+# Saldo de cliente en producción
+GET https://banco-gt-api.fly.dev/api/v1/cliente/110/saldo
+Content-Type: application/json
+
+###
+
+# Generar orden en producción
+POST https://banco-gt-api.fly.dev/api/v1/negocio/2001/generar-orden
+Content-Type: application/json
+
+{
+  "monto": 150.00,
+  "concepto": "Pago de factura #001234",
+  "vigenciaHoras": 48
 }
