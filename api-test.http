@@ -215,40 +215,43 @@ Content-Type: application/json
 ###
 
 ### ==============================
-### PASARELA DE PAGOS
+### PASARELA DE PAGOS (Ruta consolidada)
 ### ==============================
 
-# Procesar pago con tarjeta
+# ✅ Procesar pago con tarjeta (RUTA ÚNICA)
 POST http://localhost:3000/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "STORE_001_FASHION",
+  "merchantId": "SoCAB15",
   "cardNumber": "4000007714144690",
-  "amount": 10.0,
+  "amount": 150.00,
   "expDate": "10/30",
-  "cvv": "551"
+  "cvv": "551",
+  "currency": "GTQ",
+  "description": "Compra en Café La Esquina"
 }
 
 ###
 
-# Widget de demostración
-GET http://localhost:3000/demo.html
+# Obtener merchants válidos
+GET http://localhost:3000/api/v1/pagos/merchants
+Content-Type: application/json
 
 ###
 
-# Panel de Negocio - Demo
-GET http://localhost:3000/business-demo.html
+### ==============================
+### TRANSACCIONES (Solo consultas)
+### ==============================
+
+# Consultar transacción por ID
+GET http://localhost:3000/api/v1/transacciones/100001
+Content-Type: application/json
 
 ###
 
-# Archivo del widget
-GET http://localhost:3000/widget/banco-payment-widget.js
-
-###
-
-# Información de versión del widget
-GET http://localhost:3000/api/v1/widget/version
+# Listar transacciones de un merchant
+GET http://localhost:3000/api/v1/transacciones/merchant/SoCAB15?limite=10
 Content-Type: application/json
 
 ###
@@ -355,4 +358,56 @@ Content-Type: application/json
   "expDate": "12/26",
   "cvv": "123"
 }
+
+### ==============================
+### PASARELA DE PAGOS - SIMPLIFICADO
+### ==============================
+
+# 1. Obtener merchants válidos
+GET http://localhost:3000/api/v1/pagos/merchants
+Content-Type: application/json
+
+###
+
+# 2. Pago EXITOSO (solo 5 campos)
+POST http://localhost:3000/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": "SoCAB15",
+  "cardNumber": "4000007714144690",
+  "amount": 150.50,
+  "expDate": "10/30",
+  "cvv": "551"
+}
+
+###
+
+# 3. Pago con otro merchant
+POST http://localhost:3000/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": "Ca3f2b",
+  "cardNumber": "5555555555554444",
+  "amount": 250.00,
+  "expDate": "12/26",
+  "cvv": "123"
+}
+
+###
+
+# 4. Pago RECHAZADO (tarjeta de prueba)
+POST http://localhost:3000/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": "SoCAB15",
+  "cardNumber": "4000000000000002",
+  "amount": 100.00,
+  "expDate": "12/26",
+  "cvv": "123"
+}
+
+###
 

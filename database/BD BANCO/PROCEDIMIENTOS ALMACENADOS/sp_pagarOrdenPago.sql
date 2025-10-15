@@ -1,4 +1,4 @@
--- =============================================
+=-- =============================================
 -- sp_pagarOrdenPago - Para que clientes paguen órdenes
 -- =============================================
 CREATE OR ALTER PROCEDURE sp_pagarOrdenPago

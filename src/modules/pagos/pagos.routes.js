@@ -1,12 +1,12 @@
-import express from "express";
-import controller from "./pagos.controller.js";
+import { Router } from "express";
+import { procesarPago, obtenerMerchants } from "./pagos.controller.js";
 
-const router = express.Router();
+const router = Router();
 
-// Ruta existente del banco para autorización interna
-router.post("/autorizar", controller.autorizarPago);
+// Ruta principal para procesar pagos
+router.post("/charge", procesarPago);
 
-// Nueva ruta de la pasarela para pagos externos
-router.post("/charge", controller.validateCharge, controller.processPaymentGateway);
+// Obtener lista de merchants
+router.get("/merchants", obtenerMerchants);
 
 export default router;

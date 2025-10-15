@@ -59,115 +59,65 @@ const updateTransactionStatus = async ({ transactionId, status, message, cuentaR
 };
 
 /**
- * Procesa la autorización de un pago directo usando sp_autorizarPago
+ * Procesar autorización de pago usando sp_autorizarPago
+ * Este SP tiene parámetros OUTPUT que debemos manejar
  */
-const procesarAutorizacion = async (tarjcodigo, monto, tarjfecha, tarjcvv, merchantid, emplcodigo = 100, tipocodigo = 2) => {
+export const procesarAutorizacion = async (
+  tarjcodigo,
+  monto,
+  tarjfecha,
+  tarjcvv,
+  merchantid,
+  emplcodigo = 100,
+  tipocodigo = 2
+) => {
   try {
+    console.log('🔐 Servicio: Procesando autorización...');
+    console.log(`   Tarjeta: ${tarjcodigo}`);
+    console.log(`   Merchant: ${merchantid}`);
+    console.log(`   Monto: ${monto}`);
+
     const pool = await getConnection();
     const request = pool.request();
 
-    // Entradas
+    // ✅ Parámetros INPUT (en el orden correcto del SP)
     request.input('tarjcodigo', sql.VarChar(16), tarjcodigo);
-    request.input('monto', sql.Decimal(18, 2), monto);
+    request.input('monto', sql.Decimal(18, 2), parseFloat(monto));
     request.input('tarjfecha', sql.VarChar(5), tarjfecha);
     request.input('tarjcvv', sql.VarChar(4), tarjcvv);
-    request.input('merchantid', sql.VarChar(50), merchantid); // 🆕 Agregar merchantId
+    request.input('merchantid', sql.VarChar(50), merchantid);
     request.input('emplcodigo', sql.Int, emplcodigo);
     request.input('tipocodigo', sql.Int, tipocodigo);
-    
-    // Salidas
+
+    // ✅ Parámetros OUTPUT
     request.output('resultado', sql.VarChar(15));
     request.output('mensaje', sql.VarChar(100));
     request.output('cuentacodigo', sql.Int);
 
-    // Ejecutar SP
-    const resultSP = await request.execute('sp_autorizarPago');
+    console.log('🔄 Ejecutando sp_autorizarPago...');
+    const result = await request.execute('sp_autorizarPago');
 
-    // Leer salidas
-    return {
-      status: resultSP.output.resultado || 'RECHAZADO',
-      mensaje: resultSP.output.mensaje || 'Respuesta no proporcionada por el SP.',
-      cuentacodigo: resultSP.output.cuentacodigo || null
-    };
-  } catch (err) {
-    console.error('💥 Error SQL al autorizar pago:', err.message);
-    return {
-      status: 'RECHAZADO',
-      mensaje: 'Error de ejecución en el banco. Transacción fallida.',
-      cuentacodigo: null
-    };
-  }
-};
+    const resultado = result.output.resultado;
+    const mensaje = result.output.mensaje;
+    const cuentacodigo = result.output.cuentacodigo;
 
-/**
- * Procesa un pago completo a través de la pasarela (para comercios externos).
- * @param {object} params
- * @param {string} params.merchantId
- * @param {number} params.amount
- * @param {string} params.cardNumber
- * @param {string} params.expDate
- * @param {string} params.cvv
- * @returns {Promise<{success: boolean, transactionId: number, message: string, errorCode?: string}>}
- */
-const processPaymentGateway = async ({ merchantId, amount, cardNumber, expDate, cvv }) => {
-  let pasarelaTxId = null;
-
-  try {
-    // 1️⃣ Registrar transacción inicial
-    pasarelaTxId = await registerInitialTransaction({ merchantId, amount, cardNumber });
-
-    // 2️⃣ Llamada al banco usando sp_autorizarPago con validaciones completas
-    const bankResponse = await procesarAutorizacion(cardNumber, amount, expDate, cvv, merchantId, 100, 2);
-
-    // 3️⃣ Mapear estado del banco a interno
-    const statusMap = {
-      APROBADO: "SUCCESS",
-      RECHAZADO: "FAILED",
-      ERROR: "ERROR",
-    };
-    const finalStatus = statusMap[bankResponse.status] || "UNKNOWN";
-
-    // 4️⃣ Actualizar en BD
-    await updateTransactionStatus({
-      transactionId: pasarelaTxId,
-      status: finalStatus,
-      message: bankResponse.mensaje,
-      cuentaReferencia: bankResponse.cuentacodigo || null,
-    });
+    console.log(`📊 Resultado del SP: ${resultado}`);
+    console.log(`📝 Mensaje del SP: ${mensaje}`);
 
     return {
-      success: finalStatus === "SUCCESS",
-      transactionId: pasarelaTxId,
-      message: bankResponse.mensaje,
-      errorCode: bankResponse.codigo || null,
+      status: resultado,
+      mensaje: mensaje,
+      cuentacodigo: cuentacodigo
     };
+
   } catch (error) {
-    console.error("Fallo durante el procesamiento del pago:", error.message);
-
-    if (pasarelaTxId) {
-      try {
-        await updateTransactionStatus({
-          transactionId: pasarelaTxId,
-          status: "FALLIDO",
-          message: error.message,
-        });
-      } catch (dbErr) {
-        console.error("No se pudo actualizar estado en BD:", dbErr.message);
-      }
-    }
-
-    return {
-      success: false,
-      transactionId: pasarelaTxId,
-      message: error.message,
-      errorCode: "PROCESSING_ERROR",
-    };
+    console.error('💥 Error en procesarAutorizacion:', error.message);
+    throw error;
   }
 };
 
 export default {
   procesarAutorizacion,
-  processPaymentGateway,
   registerInitialTransaction,
   updateTransactionStatus
 };

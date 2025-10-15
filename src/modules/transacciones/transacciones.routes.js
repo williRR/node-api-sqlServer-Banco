@@ -1,13 +1,16 @@
 // ✅ modules/transacciones/transacciones.routes.js
-import { Router } from 'express';
-import controller from './transacciones.controller.js';
+import { Router } from "express";
+import {
+  consultarTransaccion,
+  listarTransaccionesMerchant
+} from "./transacciones.controller.js";
 
 const router = Router();
 
-/**
- * POST /autorizar
- * Simula la autorización de un débito.
- */
-router.post('/autorizar', controller.autorizarPago);
+// Consultar transacción por ID
+router.get("/:id", consultarTransaccion);
+
+// Listar transacciones de un merchant
+router.get("/merchant/:merchantId", listarTransaccionesMerchant);
 
 export default router;
