@@ -1,5 +1,6 @@
 import { getConnection } from "../../config/db.js";
 import sql from "mssql";
+import * as negocioService from "./negocio.service.js";
 
 export const crearNegocio = async (req, res) => {
   try {
@@ -274,6 +275,59 @@ export const obtenerDashboard = async (req, res) => {
       success: false,
       message: 'Error interno del servidor',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// 💰 Ver saldo del negocio
+export const verSaldoNegocio = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`🏢 Consultando saldo del negocio ID: ${id}`);
+    
+    const saldo = await negocioService.obtenerSaldoNegocio(id);
+    
+    if (!saldo) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Negocio no encontrado o sin cuenta activa" 
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: saldo
+    });
+  } catch (error) {
+    console.error('Error obteniendo saldo de negocio:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al obtener saldo", 
+      error: error.message 
+    });
+  }
+};
+
+// 📋 Ver movimientos del negocio
+export const verMovimientosNegocio = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { limite = 20, pagina = 1 } = req.query;
+    
+    console.log(`🏢 Consultando movimientos del negocio ID: ${id}`);
+    
+    const movimientos = await negocioService.obtenerMovimientosNegocio(id, { limite, pagina });
+    
+    res.json({
+      success: true,
+      data: movimientos
+    });
+  } catch (error) {
+    console.error('Error obteniendo movimientos de negocio:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al obtener movimientos", 
+      error: error.message 
     });
   }
 };

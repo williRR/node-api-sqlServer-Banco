@@ -53,17 +53,38 @@ Content-Type: application/json
 
 ###
 
-# Realizar transferencia
+### ==============================
+### TRANSFERENCIAS - Cliente a Cliente
+### ==============================
+
+# Transferir entre clientes
 POST http://localhost:3000/api/v1/cliente/110/transferir
 Content-Type: application/json
 
 {
-  "cuentaDestino": 210105,
-  "monto": 50.00,
-  "concepto": "Pago de servicios"
+  "cuentaDestino": 210106,
+  "monto": 14.01,
+  "concepto": "Pago entre amigos"
 }
 
 ###
+
+### ==============================
+### TRANSFERENCIAS - Cliente a Negocio
+### ==============================
+
+# Transferir de cliente a negocio
+POST http://localhost:3000/api/v1/cliente/110/transferir
+Content-Type: application/json
+
+{
+  "cuentaDestino": 210106,
+  "monto": 150.00,
+  "concepto": "Pago a comercio"
+}
+
+###
+
 
 # Pagar orden de pago
 POST http://localhost:3000/api/v1/cliente/102/pagar-orden
@@ -74,7 +95,7 @@ Content-Type: application/json
   "claveAcceso": "8852"
 }
 
-
+###
 
 ### ==============================
 ### NEGOCIOS
@@ -142,6 +163,56 @@ Content-Type: application/json
 # Ver ingresos sin filtro de fecha
 GET http://localhost:3000/api/v1/negocio/2001/ingresos?limite=20
 Content-Type: application/json
+
+### ==============================
+### NEGOCIOS - Consultas Financieras
+### ==============================
+
+# Ver saldo del negocio
+GET http://localhost:3000/api/v1/negocio/2002/saldo
+Content-Type: application/json
+
+###
+
+# Ver movimientos del negocio
+GET http://localhost:3000/api/v1/negocio/2002/movimientos?limite=10&pagina=1
+Content-Type: application/json
+
+###
+
+# Ver movimientos recientes del negocio
+GET http://localhost:3000/api/v1/negocio/2002/movimientos?limite=5
+Content-Type: application/json
+
+###
+
+### ==============================
+### COMPARACIÓN: Cliente vs Negocio
+### ==============================
+
+# Saldo de Cliente
+GET http://localhost:3000/api/v1/cliente/110/saldo
+Content-Type: application/json
+
+###
+
+# Saldo de Negocio
+GET http://localhost:3000/api/v1/negocio/2001/saldo
+Content-Type: application/json
+
+###
+
+# Movimientos de Cliente
+GET http://localhost:3000/api/v1/cliente/110/movimientos?limite=5
+Content-Type: application/json
+
+###
+
+# Movimientos de Negocio
+GET http://localhost:3000/api/v1/negocio/2001/movimientos?limite=5
+Content-Type: application/json
+
+###
 
 ### ==============================
 ### PASARELA DE PAGOS
@@ -284,3 +355,4 @@ Content-Type: application/json
   "expDate": "12/26",
   "cvv": "123"
 }
+

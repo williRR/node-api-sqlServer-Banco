@@ -165,10 +165,19 @@ export const realizarTransferencia = async (req, res) => {
     const { id } = req.params;
     const { cuentaDestino, monto, concepto } = req.body;
 
+    console.log('📝 Solicitud de transferencia recibida:');
+    console.log(`   Cliente: ${id}`);
+    console.log(`   Cuenta destino: ${cuentaDestino}`);
+    console.log(`   Monto: ${monto}`);
+
     if (!cuentaDestino || !monto || monto <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Datos inválidos para la transferencia'
+        message: 'Datos inválidos para la transferencia',
+        errores: {
+          cuentaDestino: !cuentaDestino ? 'Cuenta destino requerida' : undefined,
+          monto: (!monto || monto <= 0) ? 'Monto debe ser mayor a 0' : undefined
+        }
       });
     }
 
@@ -180,22 +189,25 @@ export const realizarTransferencia = async (req, res) => {
     });
 
     if (resultado.success) {
-      res.json({
+      console.log('✅ Transferencia exitosa');
+      return res.json({
         success: true,
         message: 'Transferencia realizada exitosamente',
         data: resultado.data
       });
     } else {
-      res.status(400).json({
+      console.log('❌ Transferencia fallida:', resultado.message);
+      return res.status(400).json({
         success: false,
         message: resultado.message
       });
     }
   } catch (error) {
-    res.status(500).json({ 
+    console.error('💥 Error en controlador de transferencia:', error.message);
+    return res.status(500).json({ 
       success: false, 
       message: "Error al realizar transferencia", 
-      error: error.message 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -236,6 +248,50 @@ export const pagarOrdenPago = async (req, res) => {
       success: false, 
       message: "Error al pagar orden", 
       error: error.message 
+    });
+  }
+};
+
+// 💳 Registrar transacción de pasarela (nuevo endpoint)
+export const registrarTransaccionPasarela = async (req, res) => {
+  try {
+    const { merchantId, monto, moneda, ultimos4 } = req.body;
+
+    console.log('📝 Registrando transacción de pasarela...');
+
+    if (!merchantId || !monto || !ultimos4) {
+      return res.status(400).json({
+        success: false,
+        message: 'Datos incompletos para registrar transacción',
+        camposRequeridos: ['merchantId', 'monto', 'ultimos4']
+      });
+    }
+
+    const resultado = await clientesService.registrarTransaccionPasarela({
+      merchantId,
+      monto,
+      moneda: moneda || 'GTQ',
+      ultimos4
+    });
+
+    if (resultado.success) {
+      return res.status(201).json({
+        success: true,
+        message: 'Transacción registrada exitosamente',
+        data: resultado.data
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: resultado.message
+      });
+    }
+  } catch (error) {
+    console.error('💥 Error en registrarTransaccionPasarela:', error.message);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Error al registrar transacción", 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

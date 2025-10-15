@@ -1,24 +1,30 @@
 import { Router } from "express";
-import * as clientesController from "./clientes.controller.js";
+import {
+  crearCliente,
+  obtenerCliente,
+  actualizarCliente,
+  verSaldo,
+  verMovimientos,
+  realizarTransferencia,
+  pagarOrdenPago,
+  registrarTransaccionPasarela
+} from "./clientes.controller.js";
 
 const router = Router();
 
-// Endpoints de clientes
-router.post("/", clientesController.crearCliente);
-router.get("/:id", clientesController.obtenerCliente);
-router.put("/:id", clientesController.actualizarCliente);
+// Rutas de clientes
+router.post("/", crearCliente);
+router.get("/:id", obtenerCliente);
+router.put("/:id", actualizarCliente);
 
+// Rutas financieras
+router.get("/:id/saldo", verSaldo);
+router.get("/:id/movimientos", verMovimientos);
+router.post("/:id/transferir", realizarTransferencia);
+router.post("/:id/pagar-orden", pagarOrdenPago);
 
-// Rutas existentes para clientes
-router.post('/', clientesController.crearCliente);
-router.get('/:id', clientesController.obtenerCliente);
-router.put('/:id', clientesController.actualizarCliente);
-
-// 🆕 Nuevas rutas para funcionalidades de clientes
-router.get('/:id/saldo', clientesController.verSaldo);
-router.get('/:id/movimientos', clientesController.verMovimientos);
-router.post('/:id/transferir', clientesController.realizarTransferencia);
-router.post('/:id/pagar-orden', clientesController.pagarOrdenPago);
+// Ruta para registrar transacciones de pasarela
+router.post("/transaccion/pasarela", registrarTransaccionPasarela);
 
 export default router;
 
