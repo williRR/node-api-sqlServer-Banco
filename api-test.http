@@ -1,15 +1,70 @@
-### ==============================
-### CLIENTES
-### ==============================
+###############################################################################
+#                                                                              #
+#                     🏦 BANCO TIKAL - API REST                                #
+#                     Colección Completa de Endpoints                          #
+#                                                                              #
+###############################################################################
 
-# Obtener cliente por ID
-GET http://localhost:3000/api/v1/cliente/102
+# 📋 ÍNDICE DE ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════
+# 
+# 1. SISTEMA
+#    - Health Check
+#    - Información General
+#
+# 2. CLIENTES
+#    - CRUD de Clientes
+#    - Consultas Financieras
+#    - Transferencias
+#    - Pago de Órdenes
+#
+# 3. NEGOCIOS
+#    - CRUD de Negocios
+#    - Dashboard
+#    - Gestión de Órdenes de Pago
+#    - Consultas Financieras
+#
+# 4. PASARELA DE PAGOS
+#    - Obtener Merchants
+#    - Procesar Pagos con Tarjeta
+#    - Consultar Transacciones
+#
+# 5. ÓRDENES DE PAGO
+#    - Generar Órdenes
+#    - Consultar Órdenes
+#    - Pagar Órdenes
+#
+# 6. ENTORNOS
+#    - Local (localhost:3000)
+#    - Producción (Heroku)
+#
+###############################################################################
+
+@baseUrl = http://localhost:3000/api/v1
+@herokuUrl = https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1
+
+###############################################################################
+#                           1️⃣ SISTEMA                                        #
+###############################################################################
+
+### Health Check
+GET http://localhost:3000/health
 Content-Type: application/json
 
-###
+### Información del API
+GET {{baseUrl}}
+Content-Type: application/json
 
-# Crear cliente
-POST http://localhost:3000/api/v1/cliente/
+###############################################################################
+#                          2️⃣ CLIENTES                                        #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### CRUD DE CLIENTES
+### ────────────────────────────────────────────────────────────────────────
+
+### 2.1 Crear Cliente
+POST {{baseUrl}}/cliente
 Content-Type: application/json
 
 {
@@ -24,41 +79,41 @@ Content-Type: application/json
   "email": "elena.r@example.com"
 }
 
-###
+### 2.2 Obtener Cliente por ID
+GET {{baseUrl}}/cliente/102
+Content-Type: application/json
 
-# Actualizar cliente
-PUT http://localhost:3000/api/v1/cliente/120
+### 2.3 Actualizar Cliente
+PUT {{baseUrl}}/cliente/120
 Content-Type: application/json
 
 {
-  "nombre": "Elena Sofí",
+  "nombre": "Elena Sofía",
   "direccion": "Avenida 20, 15-30, Zona 10"
 }
 
+### ────────────────────────────────────────────────────────────────────────
+### CONSULTAS FINANCIERAS DEL CLIENTE
+### ────────────────────────────────────────────────────────────────────────
 
-
-### ==============================
-### CLIENTES - Nuevas funcionalidades
-### ==============================
-
-# Ver saldo del cliente
-GET http://localhost:3000/api/v1/cliente/110/saldo
+### 2.4 Ver Saldo del Cliente
+GET {{baseUrl}}/cliente/110/saldo
 Content-Type: application/json
 
-###
-
-# Ver movimientos del cliente
-GET http://localhost:3000/api/v1/cliente/110/movimientos?limite=10&pagina=1
+### 2.5 Ver Movimientos del Cliente (Paginado)
+GET {{baseUrl}}/cliente/110/movimientos?limite=10&pagina=1
 Content-Type: application/json
 
-###
+### 2.6 Ver Movimientos Recientes (5 últimos)
+GET {{baseUrl}}/cliente/110/movimientos?limite=5
+Content-Type: application/json
 
-### ==============================
-### TRANSFERENCIAS - Cliente a Cliente
-### ==============================
+### ────────────────────────────────────────────────────────────────────────
+### OPERACIONES DEL CLIENTE
+### ────────────────────────────────────────────────────────────────────────
 
-# Transferir entre clientes
-POST http://localhost:3000/api/v1/cliente/110/transferir
+### 2.7 Transferencia Cliente a Cliente
+POST {{baseUrl}}/cliente/110/transferir
 Content-Type: application/json
 
 {
@@ -67,14 +122,8 @@ Content-Type: application/json
   "concepto": "Pago entre amigos"
 }
 
-###
-
-### ==============================
-### TRANSFERENCIAS - Cliente a Negocio
-### ==============================
-
-# Transferir de cliente a negocio
-POST http://localhost:3000/api/v1/cliente/110/transferir
+### 2.8 Transferencia Cliente a Negocio
+POST {{baseUrl}}/cliente/110/transferir
 Content-Type: application/json
 
 {
@@ -83,26 +132,25 @@ Content-Type: application/json
   "concepto": "Pago a comercio"
 }
 
-###
-
-
-# Pagar orden de pago
-POST http://localhost:3000/api/v1/cliente/102/pagar-orden
+### 2.9 Pagar Orden de Pago
+POST {{baseUrl}}/cliente/110/pagar-orden
 Content-Type: application/json
 
 {
-  "codigoOrden": "ORD1234567",
-  "claveAcceso": "8852"
+  "codigoOrden": "ORD0584636",
+  "claveAcceso": "9964"
 }
 
-###
+###############################################################################
+#                          3️⃣ NEGOCIOS                                        #
+###############################################################################
 
-### ==============================
-### NEGOCIOS
-### ==============================
+### ────────────────────────────────────────────────────────────────────────
+### CRUD DE NEGOCIOS
+### ────────────────────────────────────────────────────────────────────────
 
-# Crear negocio (devuelve usuario y clave)
-POST http://localhost:3000/api/v1/negocio/
+### 3.1 Crear Negocio
+POST {{baseUrl}}/negocio
 Content-Type: application/json
 
 {
@@ -114,205 +162,141 @@ Content-Type: application/json
   "email": "info@cafelaesquina.com"
 }
 
-###
-
-# Obtener negocio por ID
-GET http://localhost:3000/api/v1/negocio/2009
+### 3.2 Obtener Negocio por ID
+GET {{baseUrl}}/negocio/2002
 Content-Type: application/json
 
-### ==============================
-### NEGOCIOS - Nuevas funcionalidades
-### ==============================
+### ────────────────────────────────────────────────────────────────────────
+### CONSULTAS FINANCIERAS DEL NEGOCIO
+### ────────────────────────────────────────────────────────────────────────
 
-# Dashboard del negocio
-GET http://localhost:3000/api/v1/negocio/2001/dashboard
+### 3.3 Dashboard del Negocio
+GET {{baseUrl}}/negocio/2002/dashboard
 Content-Type: application/json
 
-###
+### 3.4 Ver Saldo del Negocio
+GET {{baseUrl}}/negocio/2002/saldo
+Content-Type: application/json
 
-# Generar orden de pago
-POST http://localhost:3000/api/v1/negocio/2001/generar-orden
+### 3.5 Ver Movimientos del Negocio
+GET {{baseUrl}}/negocio/2002/movimientos?limite=10&pagina=1
+Content-Type: application/json
+
+### 3.6 Ver Movimientos Recientes (5 últimos)
+GET {{baseUrl}}/negocio/2002/movimientos?limite=5
+Content-Type: application/json
+
+### ────────────────────────────────────────────────────────────────────────
+### GESTIÓN DE ÓRDENES DE PAGO
+### ────────────────────────────────────────────────────────────────────────
+
+### 3.7 Generar Orden de Pago
+POST {{baseUrl}}/negocio/2002/generar-orden
 Content-Type: application/json
 
 {
-  "monto": 150.00,
+  "monto": 250.50,
   "concepto": "Pago de factura #001234",
   "vigenciaHoras": 48
 }
 
-###
-
-# Ver órdenes generadas
-GET http://localhost:3000/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=20
+### 3.8 Ver Órdenes Pendientes
+GET {{baseUrl}}/negocio/2002/ordenes?estado=PENDIENTE&limite=20
 Content-Type: application/json
 
-###
-
-# Ver todos las órdenes (sin filtro de estado)
-GET http://localhost:3000/api/v1/negocio/2001/ordenes?limite=20
+### 3.9 Ver Todas las Órdenes
+GET {{baseUrl}}/negocio/2002/ordenes?limite=20
 Content-Type: application/json
 
-###
-
-# Ver ingresos del negocio
-GET http://localhost:3000/api/v1/negocio/2001/ingresos?fechaInicio=2024-01-01&limite=50
+### 3.10 Ver Órdenes Pagadas
+GET {{baseUrl}}/negocio/2002/ordenes?estado=PAGADO&limite=10
 Content-Type: application/json
 
-###
-
-# Ver ingresos sin filtro de fecha
-GET http://localhost:3000/api/v1/negocio/2001/ingresos?limite=20
+### 3.11 Ver Ingresos (con fecha)
+GET {{baseUrl}}/negocio/2002/ingresos?fechaInicio=2024-01-01&limite=50
 Content-Type: application/json
 
-### ==============================
-### NEGOCIOS - Consultas Financieras
-### ==============================
-
-# Ver saldo del negocio
-GET http://localhost:3000/api/v1/negocio/2002/saldo
+### 3.12 Ver Ingresos (sin filtro)
+GET {{baseUrl}}/negocio/2002/ingresos?limite=20
 Content-Type: application/json
 
-###
+###############################################################################
+#                      4️⃣ PASARELA DE PAGOS                                   #
+###############################################################################
 
-# Ver movimientos del negocio
-GET http://localhost:3000/api/v1/negocio/2002/movimientos?limite=10&pagina=1
+### ────────────────────────────────────────────────────────────────────────
+### GESTIÓN DE MERCHANTS
+### ────────────────────────────────────────────────────────────────────────
+
+### 4.1 Obtener Merchants Válidos
+GET {{baseUrl}}/pagos/merchants
 Content-Type: application/json
 
-###
+### ────────────────────────────────────────────────────────────────────────
+### PROCESAMIENTO DE PAGOS CON TARJETA
+### ────────────────────────────────────────────────────────────────────────
 
-# Ver movimientos recientes del negocio
-GET http://localhost:3000/api/v1/negocio/2002/movimientos?limite=5
-Content-Type: application/json
-
-###
-
-### ==============================
-### COMPARACIÓN: Cliente vs Negocio
-### ==============================
-
-# Saldo de Cliente
-GET http://localhost:3000/api/v1/cliente/110/saldo
-Content-Type: application/json
-
-###
-
-# Saldo de Negocio
-GET http://localhost:3000/api/v1/negocio/2001/saldo
-Content-Type: application/json
-
-###
-
-# Movimientos de Cliente
-GET http://localhost:3000/api/v1/cliente/110/movimientos?limite=5
-Content-Type: application/json
-
-###
-
-# Movimientos de Negocio
-GET http://localhost:3000/api/v1/negocio/2001/movimientos?limite=5
-Content-Type: application/json
-
-###
-
-### ==============================
-### PASARELA DE PAGOS (Ruta consolidada)
-### ==============================
-
-# ✅ Procesar pago con tarjeta (RUTA ÚNICA)
-POST http://localhost:3000/api/v1/pagos/charge
+### 4.2 Pago Exitoso - Negocio 2002
+POST {{baseUrl}}/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "SoCAB15",
+  "merchantId": 2002,
   "cardNumber": "4000007714144690",
-  "amount": 150.00,
+  "amount": 250.50,
   "expDate": "10/30",
-  "cvv": "551",
-  "currency": "GTQ",
-  "description": "Compra en Café La Esquina"
+  "cvv": "551"
 }
 
-###
-
-# Obtener merchants válidos
-GET http://localhost:3000/api/v1/pagos/merchants
-Content-Type: application/json
-
-###
-
-### ==============================
-### TRANSACCIONES (Solo consultas)
-### ==============================
-
-# Consultar transacción por ID
-GET http://localhost:3000/api/v1/transacciones/100001
-Content-Type: application/json
-
-###
-
-# Listar transacciones de un merchant
-GET http://localhost:3000/api/v1/transacciones/merchant/SoCAB15?limite=10
-Content-Type: application/json
-
-###
-
-### ==============================
-### PRODUCCIÓN - Heroku
-### ==============================
-
-# Health check en Heroku
-GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/widget/version
-Content-Type: application/json
-
-###
-
-# Procesar pago con tarjeta en Heroku
-POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
+### 4.3 Pago con Tarjeta VISA
+POST {{baseUrl}}/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "STORE_001_FASHION",
+  "merchantId": 2002,
   "cardNumber": "4000007714144690",
-  "amount": 75.50,
+  "amount": 150.50,
   "expDate": "12/26",
   "cvv": "123"
 }
 
-###
-
-# Generar orden de pago en Heroku
-POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/generar-orden
+### 4.4 Pago con Tarjeta Mastercard
+POST {{baseUrl}}/pagos/charge
 Content-Type: application/json
 
 {
-  "monto": 250.00,
-  "concepto": "Pago de factura #FAC-2024-001",
-  "vigenciaHoras": 48
+  "merchantId": 2002,
+  "cardNumber": "5555555555554444",
+  "amount": 200.00,
+  "expDate": "12/26",
+  "cvv": "456"
 }
 
-###
-
-# Ver saldo de cliente en Heroku
-GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/110/saldo
+### 4.5 Pago Rechazado (tarjeta de prueba)
+POST {{baseUrl}}/pagos/charge
 Content-Type: application/json
 
-###
+{
+  "merchantId": 2002,
+  "cardNumber": "4000000000000002",
+  "amount": 100.00,
+  "expDate": "12/26",
+  "cvv": "123"
+}
 
-# Dashboard de negocio en Heroku
-GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/dashboard
+### ────────────────────────────────────────────────────────────────────────
+### CONSULTA DE TRANSACCIONES
+### ────────────────────────────────────────────────────────────────────────
+
+### 4.6 Consultar Transacción por ID
+GET {{baseUrl}}/transacciones/100001
 Content-Type: application/json
 
-###
-
-# Ver órdenes pendientes en Heroku
-GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/negocio/2001/ordenes?estado=PENDIENTE&limite=10
+### 4.7 Listar Transacciones de un Merchant
+GET {{baseUrl}}/transacciones/merchant/2002?limite=10
 Content-Type: application/json
 
-###
-
-# Realizar transferencia en Heroku
-POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102/transferir
-Content-Type: application/json
+############################################################################
 
 {
   "cuentaDestino": 210105,
@@ -374,10 +358,10 @@ POST http://localhost:3000/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "SoCAB15",
+  "merchantId": "tecnoavanzada",
   "cardNumber": "4000007714144690",
   "amount": 150.50,
-  "expDate": "10/30",
+  "expDate": "10/27",
   "cvv": "551"
 }
 
@@ -408,6 +392,66 @@ Content-Type: application/json
   "expDate": "12/26",
   "cvv": "123"
 }
+
+###
+
+### ==============================
+### PASARELA DE PAGOS - NEGOCIO 2002
+### ==============================
+
+# 1. Verificar que el negocio 2002 existe
+GET http://localhost:3000/api/v1/negocio/2002
+Content-Type: application/json
+
+###
+
+# 2. Ver merchants válidos (debe incluir 2002)
+GET http://localhost:3000/api/v1/pagos/merchants
+Content-Type: application/json
+
+###
+
+# 3. Pago con tarjeta para negocio 2002
+POST http://localhost:3000/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": "2002",
+  "cardNumber": "4000007714144690",
+  "amount": 250.50,
+  "expDate": "10/30",
+  "cvv": "551"
+}
+
+###
+
+# 4. Generar orden de pago para negocio 2002
+POST http://localhost:3000/api/v1/negocio/2002/generar-orden
+Content-Type: application/json
+
+{
+  "monto": 150.00,
+  "concepto": "Pago de prueba negocio 2002",
+  "vigenciaHoras": 48
+}
+
+###
+
+# 5. Ver saldo del negocio 2002
+GET http://localhost:3000/api/v1/negocio/2002/saldo
+Content-Type: application/json
+
+###
+
+# 6. Ver movimientos del negocio 2002
+GET http://localhost:3000/api/v1/negocio/2002/movimientos?limite=10
+Content-Type: application/json
+
+###
+
+# 7. Dashboard del negocio 2002
+GET http://localhost:3000/api/v1/negocio/2002/dashboard
+Content-Type: application/json
 
 ###
 

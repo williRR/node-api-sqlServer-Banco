@@ -1,333 +1,384 @@
 import { getConnection } from "../../config/db.js";
 import sql from "mssql";
-import * as negocioService from "./negocio.service.js";
 
+// Crear negocio
 export const crearNegocio = async (req, res) => {
   try {
     console.log('🏢 Creando nuevo negocio...');
-    console.log('Body:', JSON.stringify(req.body, null, 2));
-    
-    const { 
-      nombre, 
-      nit, 
-      ciudad, 
-      direccion, 
-      telefono, 
-      email
-    } = req.body;
+    const { nombre, nit, ciudad, direccion, telefono, email } = req.body;
 
-    // Validaciones básicas
-    if (!nombre || !nit || !ciudad) {
-      return res.status(400).json({
-        success: false,
-        message: 'Faltan campos requeridos: nombre, nit, ciudad',
-        camposRequeridos: ['nombre', 'nit', 'ciudad']
-      });
-    }
-
-    console.log('🔌 Obteniendo conexión...');
     const pool = await getConnection();
-    console.log('✅ Conexión obtenida');
-    
     const request = pool.request();
-    
-    // ✅ Parámetros con nombres que coinciden con el SP
-    console.log('📦 Agregando parámetros...');
-    request.input('negonombre', sql.VarChar(50), nombre);
-    request.input('negnit', sql.VarChar(15), nit);
-    request.input('negociudad', sql.VarChar(30), ciudad);
-    request.input('negodireccion', sql.VarChar(50), direccion || '');
-    request.input('negotelefono', sql.VarChar(20), telefono || null);
-    request.input('negoemail', sql.VarChar(50), email || null);
 
-    console.log('🔄 Ejecutando sp_crearNegocio...');
-    
+    request.input('nombre', sql.VarChar(50), nombre);
+    request.input('nit', sql.VarChar(11), nit);
+    request.input('ciudad', sql.VarChar(30), ciudad);
+    request.input('direccion', sql.VarChar(50), direccion);
+    request.input('telefono', sql.VarChar(20), telefono || null);
+    request.input('email', sql.VarChar(50), email || null);
+
     const result = await request.execute('sp_crearNegocio');
-    
-    console.log('✅ Procedimiento ejecutado');
-    console.log('📊 Resultado completo:', JSON.stringify(result, null, 2));
-    console.log('📦 Recordset:', JSON.stringify(result.recordset, null, 2));
-    console.log('📈 RowsAffected:', result.rowsAffected);
-    console.log('🔢 ReturnValue:', result.returnValue);
-    
-    // ✅ Verificar que hay recordset
-    if (!result.recordset || result.recordset.length === 0) {
-      console.error('❌ El procedimiento no devolvió recordset');
-      console.error('Posibles causas:');
-      console.error('1. El procedimiento no existe');
-      console.error('2. El procedimiento no tiene SELECT al final');
-      console.error('3. El procedimiento falló antes de llegar al SELECT');
-      
-      return res.status(500).json({
-        success: false,
-        message: 'El procedimiento almacenado no devolvió datos',
-        debug: {
-          hasRecordset: !!result.recordset,
-          recordsetLength: result.recordset?.length || 0,
-          rowsAffected: result.rowsAffected,
-          returnValue: result.returnValue,
-          hint: 'Verifica que sp_crearNegocio exista y tenga SELECT al final'
-        }
-      });
-    }
 
-    const data = result.recordset[0];
-    console.log('📦 Datos extraídos:', data);
-    
-    // Verificar si hubo error
-    if (data.Exito === 0 || data.Exito === false) {
-      console.error('❌ El procedimiento reportó error:', data.Mensaje);
-      return res.status(400).json({
-        success: false,
-        message: data.Mensaje || 'Error en el procedimiento almacenado',
-        errorNumero: data.ErrorNumero
-      });
-    }
-
-    // ✅ Éxito - Devolver datos incluyendo usuario y clave
-    console.log('✅ Negocio creado exitosamente - ID:', data.NegocioID);
-    
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: 'Negocio creado exitosamente',
-      data: {
-        negocioId: data.NegocioID,
-        nombre: data.Nombre,
-        nit: data.NIT,
-        ciudad: data.Ciudad,
-        direccion: data.Direccion,
-        telefono: data.Telefono,
-        email: data.Email,
-        credenciales: {
-          usuario: data.Usuario,
-          clave: data.Clave
-        }
-      },
-      mensaje: '⚠️ IMPORTANTE: Guarde estas credenciales de forma segura. La clave no se mostrará nuevamente.'
+      data: result.recordset[0]
     });
 
   } catch (error) {
-    console.error('💥 ERROR CRÍTICO en crearNegocio:');
-    console.error('Tipo:', error.constructor.name);
-    console.error('Mensaje:', error.message);
-    console.error('Código:', error.code);
-    console.error('Stack:', error.stack);
-    
-    // Error específico de SQL
-    if (error.number) {
-      console.error('SQL Error Number:', error.number);
-      console.error('SQL Error State:', error.state);
-      console.error('SQL Procedure:', error.procName);
-    }
-    
-    return res.status(500).json({
+    console.error('💥 Error creando negocio:', error);
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor al crear negocio',
-      error: process.env.NODE_ENV === 'development' ? {
-        message: error.message,
-        code: error.code,
-        sqlNumber: error.number,
-        procName: error.procName
-      } : undefined
+      message: 'Error al crear negocio'
     });
   }
 };
 
+// Obtener negocio por ID
 export const obtenerNegocio = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`🔍 Buscando negocio ID: ${id}`);
-
     const pool = await getConnection();
     const request = pool.request();
-    
+
     request.input('NegocioID', sql.Int, parseInt(id));
-    
+
     const result = await request.query(`
-      SELECT 
-        int_negocodigo AS NegocioID,
-        vch_negonombre AS Nombre,
-        chr_negnit AS NIT,
-        vch_negociudad AS Ciudad,
-        vch_negodireccion AS Direccion,
-        vch_negotelefono AS Telefono,
-        vch_negoemail AS Email,
-        vch_negusuario AS Usuario
-      FROM Negocio 
-      WHERE int_negocodigo = @NegocioID
+      SELECT * FROM Negocio WHERE int_negocodigo = @NegocioID
     `);
 
     if (result.recordset.length === 0) {
-      console.log('❌ Negocio no encontrado');
       return res.status(404).json({
         success: false,
         message: 'Negocio no encontrado'
       });
     }
 
-    console.log('✅ Negocio encontrado');
-    
-    return res.json({
+    res.json({
       success: true,
       data: result.recordset[0]
     });
 
   } catch (error) {
-    console.error('💥 ERROR en obtenerNegocio:', error.message);
-    
-    return res.status(500).json({
+    console.error('Error obteniendo negocio:', error);
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Error al obtener negocio'
     });
   }
 };
 
+// Actualizar negocio
 export const actualizarNegocio = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, direccion, telefono, email } = req.body;
-
-    console.log(`📝 Actualizando negocio ID: ${id}`);
+    const updates = req.body;
 
     const pool = await getConnection();
     const request = pool.request();
-    
-    request.input('NegocioID', sql.Int, parseInt(id));
-    request.input('Nombre', sql.VarChar(50), nombre);
-    request.input('Direccion', sql.VarChar(50), direccion);
-    request.input('Telefono', sql.VarChar(20), telefono);
-    request.input('Email', sql.VarChar(50), email);
 
-    const result = await request.query(`
-      UPDATE Negocio 
-      SET vch_negonombre = @Nombre,
-          vch_negodireccion = @Direccion,
-          vch_negotelefono = @Telefono,
-          vch_negoemail = @Email
-      WHERE int_negocodigo = @NegocioID
+    request.input('NegocioID', sql.Int, parseInt(id));
+    
+    // Construir UPDATE dinámico
+    const setClause = Object.keys(updates)
+      .map(key => `${key} = @${key}`)
+      .join(', ');
+
+    Object.entries(updates).forEach(([key, value]) => {
+      request.input(key, value);
+    });
+
+    await request.query(`
+      UPDATE Negocio SET ${setClause} WHERE int_negocodigo = @NegocioID
     `);
 
-    if (result.rowsAffected[0] === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Negocio no encontrado'
-      });
-    }
-
-    console.log('✅ Negocio actualizado');
-
-    return res.json({
+    res.json({
       success: true,
       message: 'Negocio actualizado exitosamente'
     });
 
   } catch (error) {
-    console.error('💥 ERROR en actualizarNegocio:', error.message);
-    
-    return res.status(500).json({
+    console.error('Error actualizando negocio:', error);
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Error al actualizar negocio'
     });
   }
 };
 
+// Dashboard del negocio
 export const obtenerDashboard = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`📊 Obteniendo dashboard para negocio ID: ${id}`);
+    const pool = await getConnection();
+    const request = pool.request();
+
+    request.input('NegocioID', sql.Int, parseInt(id));
+
+    // Obtener estadísticas
+    const result = await request.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM OrdenPago WHERE int_negocodigo = @NegocioID AND vch_estado = 'PENDIENTE') AS OrdenesPendientes,
+        (SELECT COUNT(*) FROM OrdenPago WHERE int_negocodigo = @NegocioID AND vch_estado = 'PAGADO' AND CAST(dtt_fechapago AS DATE) = CAST(GETDATE() AS DATE)) AS PagosHoy,
+        (SELECT COALESCE(SUM(dec_monto), 0) FROM OrdenPago WHERE int_negocodigo = @NegocioID AND vch_estado = 'PAGADO' AND CAST(dtt_fechapago AS DATE) = CAST(GETDATE() AS DATE)) AS IngresosHoy,
+        (SELECT COALESCE(SUM(dec_monto), 0) FROM OrdenPago WHERE int_negocodigo = @NegocioID AND vch_estado = 'PAGADO') AS TotalIngresos
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
+
+  } catch (error) {
+    console.error('Error obteniendo dashboard:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener dashboard'
+    });
+  }
+};
+
+// Generar orden de pago
+export const generarOrdenPago = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { monto, concepto, vigenciaHoras } = req.body;
+
+    console.log(`🧾 Generando orden de pago para negocio ${id}`);
+
+    if (!monto || monto <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Monto inválido'
+      });
+    }
 
     const pool = await getConnection();
     const request = pool.request();
-    
-    request.input('NegocioID', sql.Int, parseInt(id));
 
-    // Obtener estadísticas del negocio
-    const estadisticas = await request.query(`
-      SELECT 
-        COUNT(CASE WHEN op.chr_ordenestado = 'PENDIENTE' THEN 1 END) AS OrdenesPendientes,
-        COUNT(CASE WHEN op.chr_ordenestado = 'PAGADO' THEN 1 END) AS OrdenesPagadas,
-        COALESCE(SUM(CASE WHEN op.chr_ordenestado = 'PAGADO' THEN op.dec_ordenmonto ELSE 0 END), 0) AS TotalIngresos,
-        COALESCE(SUM(CASE WHEN op.chr_ordenestado = 'PAGADO' AND CAST(op.dtt_ordenfechapago AS DATE) = CAST(GETDATE() AS DATE) THEN op.dec_ordenmonto ELSE 0 END), 0) AS IngresosHoy
-      FROM OrdenPago op
-      WHERE op.int_negocodigo = @NegocioID
-    `);
+    request.input('negocioId', sql.Int, parseInt(id));
+    request.input('monto', sql.Decimal(18, 2), parseFloat(monto));
+    request.input('concepto', sql.VarChar(200), concepto);
+    request.input('vigenciaHoras', sql.Int, parseInt(vigenciaHoras) || 48);
 
-    const data = estadisticas.recordset[0];
+    request.output('codigoOrden', sql.VarChar(20));
+    request.output('claveAcceso', sql.VarChar(8));
+    request.output('fechaVencimiento', sql.DateTime);
 
-    console.log('✅ Dashboard obtenido');
+    const result = await request.execute('sp_generarOrdenPago');
 
-    return res.json({
+    res.status(201).json({
       success: true,
+      message: 'Orden de pago generada exitosamente',
       data: {
-        ordenesPendientes: data.OrdenesPendientes || 0,
-        ordenesPagadas: data.OrdenesPagadas || 0,
-        totalIngresos: parseFloat(data.TotalIngresos) || 0,
-        ingresosHoy: parseFloat(data.IngresosHoy) || 0
+        codigoOrden: result.output.codigoOrden,
+        claveAcceso: result.output.claveAcceso,
+        monto: parseFloat(monto),
+        concepto,
+        fechaVencimiento: result.output.fechaVencimiento,
+        vigenciaHoras: parseInt(vigenciaHoras) || 48
       }
     });
 
   } catch (error) {
-    console.error('💥 ERROR en obtenerDashboard:', error.message);
-    
-    return res.status(500).json({
+    console.error('💥 Error generando orden:', error);
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Error al generar orden de pago'
     });
   }
 };
 
-// 💰 Ver saldo del negocio
+// Obtener órdenes del negocio
+export const obtenerOrdenes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado, limite = 20 } = req.query;
+
+    const pool = await getConnection();
+    const request = pool.request();
+
+    request.input('NegocioID', sql.Int, parseInt(id));
+    request.input('Limite', sql.Int, parseInt(limite));
+
+    let query = `
+      SELECT TOP (@Limite)
+        int_ordenid AS OrdenID,
+        vch_codigorden AS CodigoOrden,
+        dec_monto AS Monto,
+        vch_concepto AS Concepto,
+        vch_estado AS Estado,
+        dtt_fechacreacion AS FechaCreacion,
+        dtt_fechavencimiento AS FechaVencimiento,
+        dtt_fechapago AS FechaPago
+      FROM OrdenPago
+      WHERE int_negocodigo = @NegocioID
+    `;
+
+    if (estado) {
+      request.input('Estado', sql.VarChar(15), estado.toUpperCase());
+      query += ` AND vch_estado = @Estado`;
+    }
+
+    query += ` ORDER BY dtt_fechacreacion DESC`;
+
+    const result = await request.query(query);
+
+    res.json({
+      success: true,
+      data: {
+        ordenes: result.recordset,
+        total: result.recordset.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error obteniendo órdenes:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener órdenes'
+    });
+  }
+};
+
+// Obtener ingresos del negocio
+export const obtenerIngresos = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fechaInicio, limite = 20 } = req.query;
+
+    const pool = await getConnection();
+    const request = pool.request();
+
+    request.input('NegocioID', sql.Int, parseInt(id));
+    request.input('Limite', sql.Int, parseInt(limite));
+
+    let query = `
+      SELECT TOP (@Limite)
+        int_ordenid AS OrdenID,
+        vch_codigorden AS CodigoOrden,
+        dec_monto AS Monto,
+        vch_concepto AS Concepto,
+        dtt_fechapago AS FechaPago
+      FROM OrdenPago
+      WHERE int_negocodigo = @NegocioID
+        AND vch_estado = 'PAGADO'
+    `;
+
+    if (fechaInicio) {
+      request.input('FechaInicio', sql.Date, fechaInicio);
+      query += ` AND CAST(dtt_fechapago AS DATE) >= @FechaInicio`;
+    }
+
+    query += ` ORDER BY dtt_fechapago DESC`;
+
+    const result = await request.query(query);
+
+    // Total de ingresos
+    const totalRequest = pool.request();
+    totalRequest.input('NegocioID', sql.Int, parseInt(id));
+
+    const totalResult = await totalRequest.query(`
+      SELECT COALESCE(SUM(dec_monto), 0) AS TotalIngresos
+      FROM OrdenPago
+      WHERE int_negocodigo = @NegocioID
+        AND vch_estado = 'PAGADO'
+    `);
+
+    res.json({
+      success: true,
+      data: {
+        ingresos: result.recordset,
+        total: result.recordset.length,
+        totalIngresos: totalResult.recordset[0].TotalIngresos
+      }
+    });
+
+  } catch (error) {
+    console.error('Error obteniendo ingresos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener ingresos'
+    });
+  }
+};
+
+// Ver saldo del negocio
 export const verSaldoNegocio = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`🏢 Consultando saldo del negocio ID: ${id}`);
-    
-    const saldo = await negocioService.obtenerSaldoNegocio(id);
-    
-    if (!saldo) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Negocio no encontrado o sin cuenta activa" 
+    const pool = await getConnection();
+    const request = pool.request();
+
+    request.input('NegocioID', sql.Int, parseInt(id));
+
+    const result = await request.query(`
+      SELECT int_cuencodigo AS CuentaID, dec_cuensaldo AS Saldo
+      FROM Cuenta
+      WHERE int_negocodigo = @NegocioID AND vch_cuenestado = 'ACTIVO'
+    `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Negocio sin cuenta activa'
       });
     }
-    
+
     res.json({
       success: true,
-      data: saldo
+      data: result.recordset[0]
     });
+
   } catch (error) {
-    console.error('Error obteniendo saldo de negocio:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Error al obtener saldo", 
-      error: error.message 
+    console.error('Error obteniendo saldo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener saldo'
     });
   }
 };
 
-// 📋 Ver movimientos del negocio
+// Ver movimientos del negocio
 export const verMovimientosNegocio = async (req, res) => {
   try {
     const { id } = req.params;
-    const { limite = 20, pagina = 1 } = req.query;
-    
-    console.log(`🏢 Consultando movimientos del negocio ID: ${id}`);
-    
-    const movimientos = await negocioService.obtenerMovimientosNegocio(id, { limite, pagina });
-    
+    const { limite = 10, pagina = 1 } = req.query;
+
+    const pool = await getConnection();
+    const request = pool.request();
+
+    request.input('NegocioID', sql.Int, parseInt(id));
+    request.input('Limite', sql.Int, parseInt(limite));
+    request.input('Offset', sql.Int, (parseInt(pagina) - 1) * parseInt(limite));
+
+    const result = await request.query(`
+      SELECT TOP (@Limite)
+        m.int_movinumero AS Movimiento,
+        m.dtt_movifecha AS Fecha,
+        m.dec_moviimporte AS Importe,
+        m.int_tipocodigo AS Tipo,
+        m.vch_movitransaccionid AS TransaccionID
+      FROM Movimiento m
+      INNER JOIN Cuenta c ON m.int_cuencodigo = c.int_cuencodigo
+      WHERE c.int_negocodigo = @NegocioID
+      ORDER BY m.dtt_movifecha DESC
+      OFFSET @Offset ROWS
+    `);
+
     res.json({
       success: true,
-      data: movimientos
+      data: {
+        movimientos: result.recordset,
+        total: result.recordset.length
+      }
     });
+
   } catch (error) {
-    console.error('Error obteniendo movimientos de negocio:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Error al obtener movimientos", 
-      error: error.message 
+    console.error('Error obteniendo movimientos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener movimientos'
     });
   }
 };

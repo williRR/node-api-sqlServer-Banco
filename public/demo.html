@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco GT - Demo de Integración</title>
+    <title>Demo - Banco Tikal Payment Gateway</title>
     <style>
         * {
             margin: 0;
@@ -16,365 +16,193 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .demo-container {
             max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            width: 100%;
         }
 
-        .demo-header {
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-            color: white;
-            padding: 40px;
+        .header {
             text-align: center;
+            color: white;
+            margin-bottom: 30px;
         }
 
-        .demo-header h1 {
-            font-size: 2.5rem;
+        .header h1 {
+            font-size: 48px;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .demo-header p {
-            font-size: 1.2rem;
+        .header p {
+            font-size: 18px;
             opacity: 0.9;
         }
 
-        .demo-content {
+        .widget-wrapper {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
             padding: 40px;
         }
 
-        .demo-section {
-            margin-bottom: 50px;
-        }
-
-        .demo-section h2 {
-            color: #1e293b;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        .demo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-
-        .demo-store {
-            background: #f8fafc;
-            padding: 30px;
-            border-radius: 12px;
-            border: 2px solid #e5e7eb;
-        }
-
-        .store-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .store-logo {
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #059669, #10b981);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 15px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .store-info h3 {
-            color: #1e293b;
-            margin-bottom: 5px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .store-info p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .product-card {
-            background: white;
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
         }
 
-        .product-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+        @media print {
+            body {
+                background: white;
+            }
 
-        .product-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .product-price {
-            font-weight: 700;
-            color: #059669;
-            font-size: 1.2rem;
-        }
-
-        .buy-button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .buy-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .code-section {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-
-        .code-section h4 {
-            color: #60a5fa;
-            margin-bottom: 15px;
-        }
-
-        .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .status-success {
-            background: #f0fdf4;
-            color: #166534;
-            border-left: 4px solid #059669;
-        }
-
-        .status-error {
-            background: #fef2f2;
-            color: #dc2626;
-            border-left: 4px solid #dc2626;
-        }
-
-        .integration-steps {
-            background: #f8fafc;
-            padding: 30px;
-            border-radius: 12px;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .step {
-            margin-bottom: 20px;
-        }
-
-        .step-number {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            background: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
-            font-weight: bold;
-            margin-right: 15px;
-        }
-
-        .step-content {
-            display: inline-block;
-            vertical-align: top;
-            width: calc(100% - 45px);
-        }
-
-        @media (max-width: 768px) {
-            .demo-grid {
-                grid-template-columns: 1fr;
+            .header {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
     <div class="demo-container">
-        <div class="demo-header">
-            <h1>🏦 Banco GT Payment Gateway</h1>
-            <p>Integración fácil y segura para tu negocio</p>
+        <div class="header">
+            <h1>🏦 Banco Tikal</h1>
+            <p>Demo de Pasarela de Pagos</p>
+            <p><small>Elige tu método de pago preferido</small></p>
         </div>
 
-        <div class="demo-content">
-            <!-- Demo de tienda -->
-            <div class="demo-section">
-                <h2>💻 Demo en Vivo</h2>
-                <div class="demo-grid">
-                    <div class="demo-store">
-                        <div class="store-header">
-                            <div class="store-logo">🛍️</div>
-                            <div class="store-info">
-                                <h3>Fashion Store GT</h3>
-                                <p>Tienda de ejemplo con integración</p>
-                            </div>
-                        </div>
+        <div class="widget-wrapper">
+            <!-- Estado de carga -->
+            <div id="loading-state" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Cargando widget de Banco Tikal...</p>
+            </div>
 
-                        <div class="product-card">
-                            <div class="product-info">
-                                <span class="product-name">Camiseta Premium</span>
-                                <span class="product-price">$25.99</span>
-                            </div>
-                            <button class="buy-button" onclick="buyProduct('Camiseta Premium', 25.99)">
-                                Comprar Ahora
-                            </button>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-info">
-                                <span class="product-name">Zapatos Deportivos</span>
-                                <span class="product-price">$89.50</span>
-                            </div>
-                            <button class="buy-button" onclick="buyProduct('Zapatos Deportivos', 89.50)">
-                                Comprar Ahora
-                            </button>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-info">
-                                <span class="product-name">Chaqueta de Invierno</span>
-                                <span class="product-price">$156.00</span>
-                            </div>
-                            <button class="buy-button" onclick="buyProduct('Chaqueta de Invierno', 156.00)">
-                                Comprar Ahora
-                            </button>
-                        </div>
-
-                        <div id="status" class="status-message"></div>
-                    </div>
-
-                    <!-- Código de integración -->
-                    <div class="integration-steps">
-                        <h3>🚀 Cómo Integrar</h3>
-                        
-                        <div class="step">
-                            <span class="step-number">1</span>
-                            <div class="step-content">
-                                <strong>Incluir el Widget</strong><br>
-                                Agrega nuestro script a tu página web
-                            </div>
-                        </div>
-
-                        <div class="code-section">
-                            <h4>HTML:</h4>
-                            <code>&lt;script src="https://banco-gt-api-aa7d620b23f8.herokuapp.com/widget/banco-payment-widget.js"&gt;&lt;/script&gt;</code>
-                        </div>
-
-                        <div class="step">
-                            <span class="step-number">2</span>
-                            <div class="step-content">
-                                <strong>Inicializar el Widget</strong><br>
-                                Configura tu merchant ID y callbacks
-                            </div>
-                        </div>
-
-                        <div class="code-section">
-                            <h4>JavaScript:</h4>
-                            <pre>const payment = BancoPayment({
-    merchantId: 'TU_MERCHANT_ID',
-    onSuccess: (result) => {
-        console.log('Pago exitoso:', result);
-        // Redirigir a página de éxito
-    },
-    onError: (error) => {
-        console.error('Error:', error);
-    },
-    onCancel: () => {
-        console.log('Pago cancelado');
-    }
-});
-
-// Abrir el widget de pago
-payment.open(amount);</pre>
-                        </div>
-
-                        <div class="step">
-                            <span class="step-number">3</span>
-                            <div class="step-content">
-                                <strong>¡Listo!</strong><br>
-                                Tu tienda ya puede recibir pagos seguros
-                            </div>
-                        </div>
-                    </div>
+            <!-- Mensaje de error si no se puede cargar -->
+            <div id="error-state" style="display: none;">
+                <div class="error-message">
+                    <h3>❌ Error al cargar el widget</h3>
+                    <p id="error-message"></p>
+                    <button onclick="location.reload()" style="margin-top: 10px; padding: 10px 20px; cursor: pointer;">
+                        🔄 Reintentar
+                    </button>
                 </div>
             </div>
 
-            <!-- Datos de prueba -->
-            <div class="demo-section">
-                <h2>🧪 Datos de Prueba</h2>
-                <div class="code-section">
-                    <h4>Usar estos datos para probar:</h4>
-                    <pre>Número de Tarjeta: 4000007714144690
-Fecha de Vencimiento: 10/30
-CVV: 551
-
-Merchant ID de prueba: STORE_001_FASHION</pre>
-                </div>
-            </div>
+            <!-- El widget se renderizará aquí -->
+            <div id="banco-tikal-widget" style="display: none;"></div>
         </div>
     </div>
 
-    <!-- Widget de Banco GT -->
+    <!-- Cargar widget de Banco Tikal -->
     <script src="/widget/banco-payment-widget.js"></script>
     
     <script>
-        // Inicializar el widget de pago
-        const payment = BancoPayment({
-            merchantId: 'STORE_001_FASHION',
-            onSuccess: (result) => {
-                showStatus('success', `¡Pago exitoso! ID de transacción: ${result.transactionId}`);
-                console.log('Pago completado:', result);
-            },
-            onError: (error) => {
-                showStatus('error', `Error en el pago: ${error.message}`);
-                console.error('Error de pago:', error);
-            },
-            onCancel: () => {
-                showStatus('error', 'Pago cancelado por el usuario');
-                console.log('Pago cancelado');
+        console.log('🏦 Inicializando Demo de Banco Tikal...');
+        
+        // Verificar que el widget se haya cargado
+        function initializeWidget() {
+            if (typeof BancoTikalWidget === 'undefined') {
+                console.error('❌ BancoTikalWidget no está definido');
+                showError('El widget de Banco Tikal no se pudo cargar. Verifica que el servidor esté corriendo en http://localhost:3000');
+                return;
             }
-        });
 
-        function buyProduct(productName, price) {
-            console.log(`Comprando: ${productName} por $${price}`);
-            payment.open(price);
-        }
-
-        function showStatus(type, message) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.className = `status-message status-${type}`;
-            statusDiv.textContent = message;
-            statusDiv.style.display = 'block';
+            console.log('✅ Widget cargado correctamente');
             
-            // Ocultar después de 5 segundos
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+            // Ocultar loading, mostrar widget
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('banco-tikal-widget').style.display = 'block';
+            
+            // Configurar e inicializar el widget
+            try {
+                BancoTikalWidget.init({
+                    merchantId: 2002,  // ✅ ID del negocio (cambia según necesites)
+                    amount: 250.50,    // ✅ Monto a pagar
+                    currency: 'GTQ',
+                    
+                    // Callback cuando el pago es exitoso
+                    onSuccess: function(data) {
+                        console.log('✅ Transacción exitosa:', data);
+                        
+                        // Verificar si es pago con tarjeta o generación de orden
+                        if (data.transactionId) {
+                            // Pago con tarjeta exitoso
+                            alert(`✅ ¡Pago Procesado!\n\nTransacción: ${data.transactionId}\nMonto: Q${data.amount}\nÚltimos 4 dígitos: ${data.cardLast4}`);
+                        } else if (data.codigoOrden) {
+                            // Orden generada exitosamente
+                            console.log('📝 Orden generada:', data.codigoOrden);
+                            // El widget ya muestra la información de la orden
+                        }
+                    },
+                    
+                    // Callback cuando hay un error
+                    onError: function(error) {
+                        console.error('❌ Error en transacción:', error);
+                        alert(`❌ Error: ${error.message || 'Error desconocido'}`);
+                    }
+                });
+                
+                console.log('✅ Widget inicializado correctamente');
+            } catch (error) {
+                console.error('❌ Error inicializando widget:', error);
+                showError('Error al inicializar el widget: ' + error.message);
+            }
         }
+
+        function showError(message) {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('error-state').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+
+        // Esperar a que el DOM y el widget estén listos
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initializeWidget, 100);
+            });
+        } else {
+            setTimeout(initializeWidget, 100);
+        }
+
+        // Verificar conexión con el servidor cada 5 segundos
+        let connectionCheckInterval = setInterval(async function() {
+            try {
+                const response = await fetch('/health');
+                if (response.ok) {
+                    console.log('✅ Conexión con servidor OK');
+                    clearInterval(connectionCheckInterval);
+                }
+            } catch (error) {
+                console.warn('⚠️ No se puede conectar con el servidor');
+            }
+        }, 5000);
     </script>
 </body>
 </html>

@@ -1,12 +1,21 @@
 import { Router } from "express";
-import { procesarPago, obtenerMerchants } from "./pagos.controller.js";
+import { 
+  procesarPago, 
+  obtenerMerchants,
+  consultarTransaccion,
+  consultarOrdenPago
+} from "./pagos.controller.js";
 
 const router = Router();
 
-// Ruta principal para procesar pagos
+// Procesar pago con tarjeta
 router.post("/charge", procesarPago);
 
-// Obtener lista de merchants
+// Obtener merchants válidos
 router.get("/merchants", obtenerMerchants);
+
+// ✅ NUEVOS: Consultar estado de transacciones
+router.get("/transaccion/:transactionId", consultarTransaccion);
+router.get("/orden/:codigoOrden", consultarOrdenPago);
 
 export default router;

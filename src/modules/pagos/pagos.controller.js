@@ -112,14 +112,15 @@ const processPaymentGateway = async (req, res) => {
 };
 
 /**
- * PROCESAR PAGO CON TARJETA - Usando servicio que maneja OUTPUT
+ * PROCESAR PAGO CON TARJETA
+ * merchantId ahora debe ser el int_negocodigo (ID numérico del negocio)
  */
 export const procesarPago = async (req, res) => {
   try {
     console.log('💳 INICIO: Procesamiento de pago con tarjeta');
     
     const {
-      merchantId,
+      merchantId,  // ✅ Ahora debe ser INT (ej: 2001, 2002)
       cardNumber,
       cvv,
       expDate,
@@ -132,7 +133,19 @@ export const procesarPago = async (req, res) => {
         status: 'error',
         message: 'Campos requeridos faltantes',
         errorCode: 'MISSING_FIELDS',
-        required: ['merchantId', 'cardNumber', 'cvv', 'expDate', 'amount']
+        required: ['merchantId', 'cardNumber', 'cvv', 'expDate', 'amount'],
+        note: 'merchantId debe ser el ID numérico del negocio (ej: 2001)'
+      });
+    }
+
+    // ✅ Validar que merchantId sea numérico
+    const numMerchantId = parseInt(merchantId);
+    if (isNaN(numMerchantId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'merchantId debe ser un número (ID del negocio)',
+        errorCode: 'INVALID_MERCHANT_ID',
+        example: 'Use merchantId: 2001 o merchantId: 2002'
       });
     }
 
@@ -152,7 +165,7 @@ export const procesarPago = async (req, res) => {
     console.log('📝 PASO 1: Registrando transacción...');
     
     const registroRequest = pool.request();
-    registroRequest.input('merchantid', sql.VarChar(50), merchantId);
+    registroRequest.input('merchantid', sql.VarChar(50), merchantId.toString());
     registroRequest.input('monto', sql.Decimal(18, 2), numAmount);
     registroRequest.input('moneda', sql.VarChar(3), 'GTQ');
     registroRequest.input('ultimos4', sql.VarChar(4), ultimos4);
@@ -177,16 +190,15 @@ export const procesarPago = async (req, res) => {
     const transaccionId = transaccionData.TransaccionID;
     console.log(`✅ Transacción registrada: ID ${transaccionId}`);
 
-    // ===== PASO 2: AUTORIZAR PAGO (usando servicio que maneja OUTPUT) =====
+    // ===== PASO 2: AUTORIZAR PAGO =====
     console.log('🔐 PASO 2: Autorizando pago con servicio...');
 
-    // ✅ Usar la función importada directamente
     const autorizacionResult = await procesarAutorizacion(
       cardNumber,      // tarjcodigo
       numAmount,       // monto
       expDate,         // tarjfecha
       cvv,             // tarjcvv
-      merchantId,      // merchantid
+      numMerchantId,   // ✅ merchantid como INT
       100,             // emplcodigo
       2                // tipocodigo
     );
@@ -213,6 +225,17 @@ export const procesarPago = async (req, res) => {
 
     console.log(`✅ Estado actualizado: ${nuevoEstado}`);
 
+    // ===== PASO 4: NOTIFICAR AL E-COMMERCE (WEBHOOK) =====
+    if (resultado === 'APROBADO') {
+      // Enviar webhook al e-commerce del negocio
+      await notificarEcommerce(numMerchantId, {
+        transactionId: transaccionId,
+        amount: numAmount,
+        status: 'APROBADO',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // ===== RESPUESTA =====
     if (resultado === 'APROBADO') {
       console.log('✅ PAGO APROBADO');
@@ -223,7 +246,7 @@ export const procesarPago = async (req, res) => {
         data: {
           transactionId: transaccionId,
           authorizationCode: `AUTH${Date.now()}`,
-          merchantId,
+          merchantId: numMerchantId,
           amount: numAmount,
           currency: 'GTQ',
           cardLast4: ultimos4,
@@ -240,7 +263,7 @@ export const procesarPago = async (req, res) => {
         errorCode: 'PAYMENT_DECLINED',
         data: {
           transactionId: transaccionId,
-          merchantId,
+          merchantId: numMerchantId,
           amount: numAmount,
           cardLast4: ultimos4,
           declineReason: mensaje,
@@ -267,11 +290,11 @@ export const obtenerMerchants = async (req, res) => {
     const pool = await getConnection();
     const result = await pool.request().query(`
       SELECT 
-        int_negocodigo AS NegocioID,
+        int_negocodigo AS MerchantID,
         vch_negonombre AS Nombre,
         chr_negnit AS NIT,
         vch_negociudad AS Ciudad,
-        vch_negusuario AS MerchantID
+        vch_negusuario AS Usuario
       FROM Negocio
       ORDER BY vch_negonombre
     `);
@@ -281,13 +304,14 @@ export const obtenerMerchants = async (req, res) => {
       message: 'Lista de merchants disponibles',
       data: {
         merchants: result.recordset.map(m => ({
-          merchantId: m.MerchantID,  // ✅ vch_negusuario
+          merchantId: m.MerchantID,  // ✅ Ahora es INT (int_negocodigo)
           name: m.Nombre,
           nit: m.NIT,
-          city: m.Ciudad
+          city: m.Ciudad,
+          username: m.Usuario
         })),
         total: result.recordset.length,
-        note: 'Use "merchantId" (vch_negusuario) en los pagos'
+        note: 'Use "merchantId" (ID numérico) en los pagos. Ejemplo: 2001, 2002'
       }
     });
   } catch (error) {
@@ -299,8 +323,149 @@ export const obtenerMerchants = async (req, res) => {
   }
 };
 
+// ✅ NUEVO ENDPOINT: Consultar estado de transacción
+export const consultarTransaccion = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    
+    const pool = await getConnection();
+    const request = pool.request();
+    
+    request.input('TransactionID', sql.Int, parseInt(transactionId));
+    
+    const result = await request.query(`
+      SELECT 
+        int_transaccionid AS TransaccionID,
+        vch_merchantid AS MerchantID,
+        dec_monto AS Monto,
+        vch_estado AS Estado,
+        dtt_fechahora AS Fecha,
+        vch_mensaje AS Mensaje
+      FROM TransaccionPasarela
+      WHERE int_transaccionid = @TransactionID
+    `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Transacción no encontrada'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
+  } catch (error) {
+    console.error('Error consultando transacción:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+// ✅ NUEVO ENDPOINT: Consultar orden de pago
+export const consultarOrdenPago = async (req, res) => {
+  try {
+    const { codigoOrden } = req.params;
+    
+    const pool = await getConnection();
+    const request = pool.request();
+    
+    request.input('CodigoOrden', sql.VarChar(20), codigoOrden);
+    
+    const result = await request.query(`
+      SELECT 
+        int_ordenid AS OrdenID,
+        int_negocodigo AS NegocioID,
+        vch_codigorden AS CodigoOrden,
+        dec_monto AS Monto,
+        vch_estado AS Estado,
+        dtt_fechacreacion AS FechaCreacion,
+        dtt_fechapago AS FechaPago,
+        int_cliecodigo_pago AS ClientePago
+      FROM OrdenPago
+      WHERE vch_codigorden = @CodigoOrden
+    `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Orden no encontrada'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
+  } catch (error) {
+    console.error('Error consultando orden:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 export default { 
   autorizarPago, 
   processPaymentGateway,
   validateCharge
 };
+
+// ✅ Función para notificar al e-commerce mediante webhook
+async function notificarEcommerce(merchantId, paymentData) {
+  try {
+    const pool = await getConnection();
+    const request = pool.request();
+    
+    request.input('MerchantID', sql.Int, merchantId);
+    
+    // Obtener URL del webhook del negocio
+    const result = await request.query(`
+      SELECT vch_webhookurl 
+      FROM Negocio 
+      WHERE int_negocodigo = @MerchantID
+    `);
+
+    if (result.recordset.length > 0 && result.recordset[0].vch_webhookurl) {
+      const webhookUrl = result.recordset[0].vch_webhookurl;
+      
+      console.log(`🔔 Enviando webhook a: ${webhookUrl}`);
+      
+      // Enviar notificación POST al e-commerce
+      const webhookResponse = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Banco-Tikal-Signature': generateWebhookSignature(paymentData)
+        },
+        body: JSON.stringify({
+          event: 'payment.success',
+          merchantId: merchantId,
+          data: paymentData
+        })
+      });
+
+      if (webhookResponse.ok) {
+        console.log('✅ Webhook enviado exitosamente');
+      } else {
+        console.error('❌ Error enviando webhook:', webhookResponse.status);
+      }
+    }
+  } catch (error) {
+    console.error('⚠️ Error enviando webhook:', error.message);
+    // No fallar el pago si el webhook falla
+  }
+}
+
+function generateWebhookSignature(data) {
+  // Generar firma HMAC para seguridad
+  const crypto = require('crypto');
+  const secret = process.env.WEBHOOK_SECRET || 'banco_tikal_secret';
+  return crypto.createHmac('sha256', secret)
+    .update(JSON.stringify(data))
+    .digest('hex');
+}

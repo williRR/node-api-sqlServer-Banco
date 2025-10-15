@@ -200,56 +200,62 @@ export const realizarTransferencia = async ({ clienteId, cuentaDestino, monto, c
 
 export const pagarOrdenPago = async ({ clienteId, codigoOrden, claveAcceso }) => {
   try {
-    console.log('🧾 Pagando orden de pago...');
+    console.log('🧾 Procesando pago de orden...');
     console.log(`   Cliente: ${clienteId}`);
-    console.log(`   Orden: ${codigoOrden}`);
+    console.log(`   Código: ${codigoOrden}`);
 
     const pool = await getConnection();
     const request = pool.request();
-    
-    request.input('ClienteID', sql.Int, parseInt(clienteId));
-    request.input('CodigoOrden', sql.VarChar(20), codigoOrden);
-    request.input('ClaveAcceso', sql.VarChar(10), claveAcceso);
 
-    console.log('🔄 Ejecutando sp_PagarOrdenPago...');
-    
-    const result = await request.execute('sp_PagarOrdenPago');
-    
-    console.log('✅ Procedimiento ejecutado');
-    console.log('Resultado:', JSON.stringify(result.recordset, null, 2));
+    // ✅ Parámetros de ENTRADA
+    request.input('clienteId', sql.Int, parseInt(clienteId));
+    request.input('codigoOrden', sql.VarChar(20), codigoOrden);
+    request.input('claveAcceso', sql.VarChar(8), claveAcceso);
 
-    if (!result.recordset || result.recordset.length === 0) {
+    // ✅ Parámetros de SALIDA (OUTPUT) - ESTOS FALTABAN
+    request.output('resultado', sql.VarChar(15));
+    request.output('mensaje', sql.VarChar(100));
+    request.output('ordenId', sql.Int);
+    request.output('monto', sql.Decimal(18, 2));
+    request.output('negocio', sql.VarChar(100));
+    request.output('transaccionId', sql.VarChar(50));
+
+    console.log('🔄 Ejecutando sp_pagarOrdenPago...');
+
+    const result = await request.execute('sp_pagarOrdenPago');
+
+    // Obtener valores de salida
+    const resultado = result.output.resultado;
+    const mensaje = result.output.mensaje;
+    const ordenId = result.output.ordenId;
+    const monto = result.output.monto;
+    const negocio = result.output.negocio;
+    const transaccionId = result.output.transaccionId;
+
+    console.log(`📊 Resultado: ${resultado}`);
+    console.log(`📝 Mensaje: ${mensaje}`);
+
+    if (resultado === 'EXITOSO') {
+      return {
+        success: true,
+        message: mensaje,
+        data: {
+          ordenId,
+          monto,
+          negocio,
+          transaccionId
+        }
+      };
+    } else {
       return {
         success: false,
-        message: 'El procedimiento no devolvió datos'
+        message: mensaje
       };
     }
-
-    const data = result.recordset[0];
-
-    if (data.Exito === 0 || data.Exito === false) {
-      return {
-        success: false,
-        message: data.Mensaje || 'Error al pagar la orden'
-      };
-    }
-
-    return {
-      success: true,
-      data: {
-        pagoId: data.PagoID || data.MovimientoID,
-        mensaje: data.Mensaje,
-        monto: data.Monto,
-        fechaPago: data.FechaPago
-      }
-    };
 
   } catch (error) {
     console.error('💥 Error en pagarOrdenPago:', error.message);
-    return {
-      success: false,
-      message: error.message
-    };
+    throw error;
   }
 };
 

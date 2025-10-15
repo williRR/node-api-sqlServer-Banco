@@ -60,32 +60,32 @@ const updateTransactionStatus = async ({ transactionId, status, message, cuentaR
 
 /**
  * Procesar autorización de pago usando sp_autorizarPago
- * Este SP tiene parámetros OUTPUT que debemos manejar
+ * @merchantid ahora es INT (int_negocodigo)
  */
 export const procesarAutorizacion = async (
   tarjcodigo,
   monto,
   tarjfecha,
   tarjcvv,
-  merchantid,
+  merchantid,  // ✅ Ahora es INT (int_negocodigo)
   emplcodigo = 100,
   tipocodigo = 2
 ) => {
   try {
     console.log('🔐 Servicio: Procesando autorización...');
     console.log(`   Tarjeta: ${tarjcodigo}`);
-    console.log(`   Merchant: ${merchantid}`);
+    console.log(`   Merchant ID (int_negocodigo): ${merchantid}`);
     console.log(`   Monto: ${monto}`);
 
     const pool = await getConnection();
     const request = pool.request();
 
-    // ✅ Parámetros INPUT (en el orden correcto del SP)
+    // ✅ Parámetros INPUT - merchantid ahora es INT
     request.input('tarjcodigo', sql.VarChar(16), tarjcodigo);
     request.input('monto', sql.Decimal(18, 2), parseFloat(monto));
     request.input('tarjfecha', sql.VarChar(5), tarjfecha);
     request.input('tarjcvv', sql.VarChar(4), tarjcvv);
-    request.input('merchantid', sql.VarChar(50), merchantid);
+    request.input('merchantid', sql.Int, parseInt(merchantid));  // ✅ Cambiado a Int
     request.input('emplcodigo', sql.Int, emplcodigo);
     request.input('tipocodigo', sql.Int, tipocodigo);
 
