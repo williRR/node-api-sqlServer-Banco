@@ -10,7 +10,12 @@
     "build": "echo 'No build process required'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "heroku-prebuild": "npm --version && node --version",
-    "heroku-postbuild": "echo 'Build completed successfully'"
+    "heroku-postbuild": "echo 'Build completed successfully'",
+    "test-db": "node scripts/test-db-connection.js",
+    "start:prod": "NODE_ENV=production node src/server.js",
+    "dev": "nodemon src/index.js",
+    "start:server": "node src/server.js",
+    "diagnose": "node scripts/diagnose-db.js"
   },
   "keywords": [
     "banco",

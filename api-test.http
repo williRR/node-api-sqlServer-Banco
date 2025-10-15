@@ -27,11 +27,11 @@ Content-Type: application/json
 ###
 
 # Actualizar cliente
-PUT http://localhost:3000/api/v1/cliente/102
+PUT http://localhost:3000/api/v1/cliente/120
 Content-Type: application/json
 
 {
-  "nombre": "Elena Sofía",
+  "nombre": "Elena Sofí",
   "direccion": "Avenida 20, 15-30, Zona 10"
 }
 
@@ -54,7 +54,7 @@ Content-Type: application/json
 ###
 
 # Realizar transferencia
-POST http://localhost:3000/api/v1/cliente/102/transferir
+POST http://localhost:3000/api/v1/cliente/110/transferir
 Content-Type: application/json
 
 {
@@ -80,32 +80,24 @@ Content-Type: application/json
 ### NEGOCIOS
 ### ==============================
 
-# Crear negocio
+# Crear negocio (devuelve usuario y clave)
 POST http://localhost:3000/api/v1/negocio/
 Content-Type: application/json
 
 {
-  "nombre": "Soluciones digitales S.A.",
-  "nit": "852147963-2",
-  "ciudad": "Ciudad de Guatemala",
-  "direccion": "4a Avenida, 2-10, Zona 1",
-  "telefono": "599124132",
-  "email": "contacto@solucionesdigitales.com"
+  "nombre": "Café La Esquina",
+  "nit": "12345678-12",
+  "ciudad": "Guatemala",
+  "direccion": "5a Avenida 10-20, Zona 1",
+  "telefono": "22345678",
+  "email": "info@cafelaesquina.com"
 }
 
 ###
 
-# Actualizar negocio
-PUT http://localhost:3000/api/v1/negocio/2001
+# Obtener negocio por ID
+GET http://localhost:3000/api/v1/negocio/2009
 Content-Type: application/json
-
-{
-  "nombre": "Café El Gato Feliz S.A.",
-  "direccion": "4a Avenida, 2-15, Zona 1",
-  "email": "administracion@elgatofeliz.com"
-}
-
-
 
 ### ==============================
 ### NEGOCIOS - Nuevas funcionalidades

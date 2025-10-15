@@ -72,7 +72,7 @@ Content-Type: application/json
 ### CUENTAS
 ### ==============================
 
-# Crear cuenta
+# Crear cuenta para cliente
 POST http://localhost:3000/api/v1/cuenta/
 Content-Type: application/json
 
@@ -80,8 +80,22 @@ Content-Type: application/json
   "monedaId": "01",
   "sucursalId": "001",
   "empleadoId": 101,
-  "clienteId": 115,
+  "clienteId": 107,
   "saldoInicial": 2000.50
+}
+
+###
+
+# Crear cuenta negocios
+POST http://localhost:3000/api/v1/cuenta/
+Content-Type: application/json
+
+{
+  "monedaId": "01",
+  "sucursalId": "001",
+  "empleadoId": 101,
+  "negocioId": 2002,
+  "saldoInicial": 2000.0
 }
 
 ###
@@ -99,11 +113,10 @@ Content-Type: application/json
 ### ==============================
 ### TARJETAS
 ### ==============================
-
 # Crear tarjeta asociada a cuenta
 POST http://localhost:3000/api/v1/tarjeta/
 Content-Type: application/json
 
 {
-  "cuencodigo": 210105
+  "cuencodigo":  210109
 }

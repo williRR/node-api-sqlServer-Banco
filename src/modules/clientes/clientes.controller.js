@@ -1,13 +1,95 @@
 import * as clientesService from "./clientes.service.js";
+import { getConnection } from "../../config/db.js";
+import sql from "mssql";
 
 export const crearCliente = async (req, res) => {
   try {
-    const data = req.body;
-    const nuevoCliente = await clientesService.crearCliente(data);
-    res.status(201).json(nuevoCliente);
+    console.log('📝 Creando nuevo cliente...');
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+    
+    const { 
+      paterno, 
+      materno, 
+      nombre, 
+      dni, 
+      nacimiento, 
+      ciudad, 
+      direccion, 
+      telefono, 
+      email
+    } = req.body;
+
+    // Validaciones básicas
+    if (!paterno || !materno || !nombre || !dni) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos: paterno, materno, nombre, dni'
+      });
+    }
+
+    const pool = await getConnection();
+    const request = pool.request();
+    
+    // ✅ Parámetros con nombres que coinciden con el SP
+    request.input('cliepaterno', sql.VarChar(25), paterno);
+    request.input('cliematerno', sql.VarChar(25), materno);
+    request.input('clienombre', sql.VarChar(30), nombre);
+    request.input('cliedni', sql.VarChar(14), dni);
+    request.input('clienacimiento', sql.Date, nacimiento || '1990-01-01');
+    request.input('clieciudad', sql.VarChar(30), ciudad || 'Guatemala');
+    request.input('cliedireccion', sql.VarChar(50), direccion || '');
+    request.input('clietelefono', sql.VarChar(20), telefono || null);
+    request.input('clieemail', sql.VarChar(50), email || null);
+
+    console.log('🔄 Ejecutando sp_crearCliente...');
+    
+    const result = await request.execute('sp_crearCliente');
+    
+    console.log('✅ Procedimiento ejecutado');
+    console.log('Resultado:', JSON.stringify(result.recordset, null, 2));
+    
+    if (!result.recordset || result.recordset.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: 'El procedimiento no devolvió datos'
+      });
+    }
+
+    const data = result.recordset[0];
+    
+    // Verificar si hubo error
+    if (data.Exito === 0) {
+      return res.status(400).json({
+        success: false,
+        message: data.Mensaje,
+        errorNumero: data.ErrorNumero
+      });
+    }
+
+    // Éxito
+    return res.status(201).json({
+      success: true,
+      message: 'Cliente creado exitosamente',
+      data: {
+        clienteId: data.ClienteID,
+        nombre: `${data.Nombre} ${data.Paterno} ${data.Materno}`,
+        email: data.Email,
+        dni: data.DNI,
+        usuario: data.Usuario,
+        clave: data.Clave
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Error al crear cliente", error: error.message });
-  } 
+    console.error('💥 ERROR:', error.message);
+    console.error('Stack:', error.stack);
+    
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 };
 
 export const obtenerCliente = async (req, res) => {

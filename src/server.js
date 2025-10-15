@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import sql from 'mssql';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getConnection } from './config/db.js';
 
 // Configurar __dirname para ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -42,43 +43,21 @@ app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// Configuración de la base de datos
-const dbConfig = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER,
-  database: process.env.DB_DATABASE,
-  options: {
-    encrypt: true,
-    trustServerCertificate: true,
-    enableArithAbort: true,
-    connectionTimeout: 60000,
-    requestTimeout: 60000,
-  },
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  }
-};
-
 // Variable global para el pool de conexiones
 let poolPromise;
 
 async function initializeDatabase() {
   try {
     console.log('🔌 Conectando a la base de datos...');
-    poolPromise = new sql.ConnectionPool(dbConfig);
-    await poolPromise.connect();
+    poolPromise = await getConnection();
     console.log('✅ Conexión a la base de datos establecida');
     return true;
   } catch (error) {
-    console.error('❌ Error conectando a la base de datos:', error);
+    console.error('❌ Error conectando a la base de datos:', error.message);
     return false;
   }
 }
 
-// Función para obtener el pool de conexiones
 async function getDbPool() {
   if (!poolPromise) {
     await initializeDatabase();
@@ -949,9 +928,8 @@ app.get('/api/v1/negocio/:id/ingresos', async (req, res) => {
     res.json({
       success: true,
       data: {
-        ingresos: result.recordset,
+        count: result.recordset.length,
         totalIngresos: totalResult.recordset[0].TotalIngresos,
-        count: result.recordset.length
       }
     });
   } catch (error) {
@@ -984,19 +962,17 @@ app.use((error, req, res, next) => {
 });
 
 // ===== CONFIGURACIÓN DEL SERVIDOR =====
-
 const PORT = process.env.PORT || 3000;
-
 // Inicializar base de datos y servidor
 async function startServer() {
-  console.log('🚀 Iniciando Banco GT API...');
+  console.log('🚀 Iniciando Banco GT API...'); 
   
   // Intentar conectar a la base de datos (no crítico para el inicio)
   const dbConnected = await initializeDatabase();
   if (!dbConnected) {
     console.log('⚠️ Servidor iniciado sin conexión a BD (funcionará con mocks)');
   }
-
+  
   // Iniciar servidor
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🎉 Servidor Banco GT API corriendo en puerto ${PORT}`);
@@ -1005,11 +981,6 @@ async function startServer() {
     console.log(`   - Health: http://localhost:${PORT}/api/v1/widget/version`);
     console.log(`   - Widget: http://localhost:${PORT}/demo.html`);
     console.log(`   - Business: http://localhost:${PORT}/business-demo.html`);
-    
-    if (process.env.NODE_ENV === 'production') {
-      console.log(`🔌 DB Server: ${process.env.DB_SERVER ? '✅ Configurado' : '❌ No configurado'}`);
-      console.log(`🗃️ Database: ${process.env.DB_DATABASE ? '✅ Configurado' : '❌ No configurado'}`);
-    }
   });
 }
 
