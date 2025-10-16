@@ -1,0 +1,15 @@
+efd12f1[m[33m ([m[1;32mmaster[m[33m)[m Remove all Fly.io related files and references - Heroku only deployment
+[33mc237ebe[m Restore database-based merchant validation for payment endpoint
+[33m3a841a0[m Migrate all URLs from Fly.dev to Heroku deployment
+[33m180badd[m Fix server.js - resolve 'app is not defined' error
+[33me4ef577[m agregando dependencias para despliege
+[33me058909[m Update all URLs to new Heroku deployment - banco-gt-api-aa7d620b23f8.herokuapp.com
+[33ma46af3a[m Remove conflicting package-lock.json for Heroku
+[33m286f92b[m arreglando dependencias npmci para heroku
+[33mb66d470[m Proyecto listo para Heroku con deploy automático
+[33me424580[m preparando para despliege en heroku
+[33m03c6377[m Deploy to Heroku - Mon Oct 13 03:22:31 PM CST 2025
+[33m3790f9f[m agregando funcionalidad de orden de pago , ver saldo y movimiuentos de la cuenta
+[33m86992e9[m update: pasarela de pagos actualizada
+[33m6a7abba[m agregando funcionalidad de debitar en cuenta al realizar transacciones por medio de tarjeta
+[33m2778a24[m feat: Agregar widget de pago visual e integración fácil
