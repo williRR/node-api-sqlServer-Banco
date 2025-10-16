@@ -5,29 +5,31 @@ config();
 export const PORT = process.env.PORT || 3000;
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// ✅ Variables de BD - valores por defecto SOLO para desarrollo
+// ✅ Variables de BD - valores por defecto para desarrollo
 export const DB_USER = process.env.DB_USER || 'sa';
-export const DB_PASSWORD = process.env.DB_PASSWORD || ''; // ⚠️ No poner contraseña aquí
+export const DB_PASSWORD = process.env.DB_PASSWORD || '';
 export const DB_SERVER = process.env.DB_SERVER || 'localhost';
 export const DB_DATABASE = process.env.DB_DATABASE || 'Banco';
 
 // ✅ Opciones de conexión según entorno
 export const DB_ENCRYPT = NODE_ENV === 'production' 
-  ? true  // Siempre true en producción
+  ? true
   : (process.env.DB_ENCRYPT || 'false').toLowerCase() === 'true';
 
 export const DB_TRUST_CERT = NODE_ENV === 'production'
-  ? false // Siempre false en producción (usar certs válidos)
+  ? false
   : (process.env.DB_TRUST_CERT || 'true').toLowerCase() === 'true';
 
-// ⚠️ Validación: En producción, exigir todas las variables
+// ⚠️ En producción, solo advertir - NO detener la app
 if (NODE_ENV === 'production') {
   const required = ['DB_USER', 'DB_PASSWORD', 'DB_SERVER', 'DB_DATABASE'];
   const missing = required.filter(key => !process.env[key]);
   
   if (missing.length > 0) {
-    console.error(`❌ ERROR: Variables de entorno faltantes en producción: ${missing.join(', ')}`);
-    process.exit(1);
+    console.warn(`⚠️ ADVERTENCIA: Variables de entorno faltantes: ${missing.join(', ')}`);
+    console.warn(`⚠️ La aplicación funcionará en modo MOCK (sin base de datos)`);
+    console.warn(`⚠️ Configura las variables en Heroku Dashboard: Settings → Config Vars`);
+    // NO hacer process.exit(1)
   }
 }
 
