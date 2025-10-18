@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Importar rutas de módulos
-//import authRoutes from "./modules/auth/auth.routes.js";
+import authRoutes from "./modules/auth/auth.routes.js";
 import clientesRoutes from "./modules/clientes/clientes.routes.js";
 import negociosRoutes from "./modules/negocio/negocio.routes.js";
 import cuentasRoutes from "./modules/cuentas/cuentas.routes.js";
@@ -60,7 +60,7 @@ app.get("/", (req, res) => {
 });
 
 // Rutas agrupadas por módulo
-//app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/cliente", clientesRoutes);
 app.use("/api/v1/negocio", negociosRoutes);
 app.use("/api/v1/cuenta", cuentasRoutes);
