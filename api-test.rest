@@ -16,7 +16,7 @@ Content-Type: application/json
   "paterno": "Ramírez",
   "materno": "Vásquez",
   "nombre": "Elena",
-  "dni": "101010101013",
+  "dni": "101010101044",
   "nacimiento": "1978-02-28",
   "ciudad": "Izabal",
   "direccion": "Barrio El Estor, Calle 15",
@@ -80,8 +80,8 @@ Content-Type: application/json
   "monedaId": "01",
   "sucursalId": "001",
   "empleadoId": 101,
-  "clienteId": 107,
-  "saldoInicial": 2000.50
+  "clienteId": 121,
+  "saldoInicial": 2000.0
 }
 
 ###

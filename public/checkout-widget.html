@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Banco Tikal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .checkout-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .checkout-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .checkout-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .checkout-header p {
+            opacity: 0.9;
+        }
+        .checkout-body {
+            padding: 30px;
+        }
+        .order-total {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        #banco-tikal-widget {
+            min-height: 400px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <!-- Encabezado -->
+        <div class="checkout-header">
+            <h1>🏦 Banco Tikal</h1>
+            <p>Pasarela de Pagos Segura</p>
+        </div>
+
+        <!-- Cuerpo -->
+        <div class="checkout-body">
+            <!-- Total a Pagar -->
+            <div class="order-total">
+                <span>Total a Pagar</span>
+                <span id="total">Q0.00</span>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- WIDGET DE BANCO TIKAL SE RENDERIZA AQUÍ     -->
+            <!-- ============================================ -->
+            <div id="banco-tikal-widget"></div>
+
+            <!-- Badge de Seguridad -->
+            <div class="secure-badge">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                </svg>
+                <span>Pago Seguro Encriptado</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Powered by <strong>Banco Tikal</strong>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CARGAR WIDGET DE BANCO TIKAL                 -->
+    <!-- ============================================ -->
+    <script src="https://banco-gt-api-aa7d620b23f8.herokuapp.com/widget/banco-payment-widget.js"></script>
+
+    <!-- ============================================ -->
+    <!-- CONFIGURACIÓN DEL WIDGET                     -->
+    <!-- ⭐ AQUÍ CONFIGURAS TU NEGOCIO               -->
+    <!-- ============================================ -->
+    <script>
+        // ========================================
+        // ⭐ CONFIGURACIÓN DE TU NEGOCIO
+        // ========================================
+        const CONFIG = {
+            merchantId: 2000,        // ← CAMBIAR: Tu ID de negocio en Banco Tikal
+            amount: 5.50,          // ← CAMBIAR: Monto total a cobrar
+            currency: 'GTQ'
+        };
+
+        // ========================================
+        // ACTUALIZAR TOTAL
+        // ========================================
+        function actualizarTotal() {
+            document.getElementById('total').textContent = `Q${CONFIG.amount.toFixed(2)}`;
+        }
+
+        // ========================================
+        // INICIALIZAR WIDGET
+        // ========================================
+        window.addEventListener('DOMContentLoaded', function() {
+            // Actualizar total visual
+            actualizarTotal();
+            
+            // Inicializar widget de Banco Tikal
+            BancoTikalWidget.init({
+                merchantId: CONFIG.merchantId,
+                amount: CONFIG.amount,
+                currency: CONFIG.currency,
+                
+                // ✅ Cuando el pago es exitoso
+                onSuccess: function(paymentData) {
+                    console.log('✅ Pago exitoso:', paymentData);
+                    
+                    // Verificar tipo de pago
+                    if (paymentData.transactionId) {
+                        // 💳 Pago con tarjeta completado
+                        console.log('Transacción ID:', paymentData.transactionId);
+                        
+                        // ========================================
+                        // ⭐ AQUÍ PUEDES:
+                        // 1. Guardar en tu base de datos
+                        // 2. Enviar email de confirmación
+                        // 3. Actualizar estado de orden
+                        // 4. Redirigir a página de éxito
+                        // ========================================
+                        
+                        // Ejemplo: Redirigir a página de confirmación
+                        window.location.href = `/confirmacion?txn=${paymentData.transactionId}&amount=${paymentData.amount}`;
+                        
+                    } else if (paymentData.codigoOrden) {
+                        // 🧾 Orden de pago generada (cliente pagará después)
+                        console.log('Orden generada:', paymentData.codigoOrden);
+                        
+                        // ========================================
+                        // ⭐ AQUÍ PUEDES:
+                        // 1. Guardar orden pendiente
+                        // 2. Enviar código al cliente por email/SMS
+                        // 3. Mostrar instrucciones de pago
+                        // ========================================
+                        
+                        alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
+                    }
+                },
+                
+                // ❌ Cuando hay un error
+                onError: function(error) {
+                    console.error('❌ Error en pago:', error);
+                    
+                    // ========================================
+                    // ⭐ AQUÍ PUEDES:
+                    // 1. Mostrar mensaje personalizado
+                    // 2. Registrar error en logs
+                    // 3. Ofrecer métodos de pago alternativos
+                    // ========================================
+                    
+                    alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

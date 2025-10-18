@@ -80,11 +80,11 @@ Content-Type: application/json
 }
 
 ### 2.2 Obtener Cliente por ID
-GET {{baseUrl}}/cliente/102
+GET https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102
 Content-Type: application/json
 
 ### 2.3 Actualizar Cliente
-PUT {{baseUrl}}/cliente/120
+PUT https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102
 Content-Type: application/json
 
 {
@@ -113,12 +113,12 @@ Content-Type: application/json
 ### ────────────────────────────────────────────────────────────────────────
 
 ### 2.7 Transferencia Cliente a Cliente
-POST {{baseUrl}}/cliente/110/transferir
+POST {{baseUrl}}/cliente/107/transferir
 Content-Type: application/json
 
 {
-  "cuentaDestino": 210106,
-  "monto": 14.01,
+  "cuentaDestino": 210104,
+  "monto": 10.0,
   "concepto": "Pago entre amigos"
 }
 
@@ -133,12 +133,12 @@ Content-Type: application/json
 }
 
 ### 2.9 Pagar Orden de Pago
-POST {{baseUrl}}/cliente/110/pagar-orden
+POST {{baseUrl}}/cliente/107/pagar-orden
 Content-Type: application/json
 
 {
-  "codigoOrden": "ORD0584636",
-  "claveAcceso": "9964"
+  "codigoOrden": "ORD0537590",
+  "claveAcceso": "4217"
 }
 
 ###############################################################################
@@ -179,11 +179,11 @@ GET {{baseUrl}}/negocio/2002/saldo
 Content-Type: application/json
 
 ### 3.5 Ver Movimientos del Negocio
-GET {{baseUrl}}/negocio/2002/movimientos?limite=10&pagina=1
+GET {{baseUrl}}/negocio/2001/movimientos?limite=10&pagina=1
 Content-Type: application/json
 
 ### 3.6 Ver Movimientos Recientes (5 últimos)
-GET {{baseUrl}}/negocio/2002/movimientos?limite=5
+GET {{baseUrl}}/negocio/2001/movimientos?limite=5
 Content-Type: application/json
 
 ### ────────────────────────────────────────────────────────────────────────
@@ -336,11 +336,11 @@ POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "STORE_001_FASHION",
+  "merchantId": "2000",
   "cardNumber": "4000007714144690",
-  "amount": 75.50,
-  "expDate": "12/26",
-  "cvv": "123"
+  "amount": 5.50,
+  "expDate": "10/30",
+  "cvv": "551"
 }
 
 ### ==============================
@@ -372,7 +372,7 @@ POST http://localhost:3000/api/v1/pagos/charge
 Content-Type: application/json
 
 {
-  "merchantId": "Ca3f2b",
+  "merchantId": "2002",
   "cardNumber": "5555555555554444",
   "amount": 250.00,
   "expDate": "12/26",
@@ -455,3 +455,13 @@ Content-Type: application/json
 
 ###
 
+POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": 2000,
+  "cardNumber": "4000007714144690",
+  "amount": 0.75,
+  "expDate": "10/30",
+  "cvv": "551"
+}

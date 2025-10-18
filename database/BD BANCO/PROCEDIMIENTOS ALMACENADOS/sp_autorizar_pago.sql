@@ -2,16 +2,13 @@
 -- sp_autorizarPago - VERSIÓN CON ID DE NEGOCIO
 -- Usa int_negocodigo en lugar de vch_negusuario
 -- =============================================
-USE Banco_Backup;
+USE Banco;
 GO
 
--- Eliminar el procedimiento existente si hay conflictos
-IF OBJECT_ID('sp_autorizarPago', 'P') IS NOT NULL
-    DROP PROCEDURE sp_autorizarPago;
-GO
+
 
 -- Crear procedimiento desde cero con ID de negocio
-CREATE PROCEDURE sp_autorizarPago
+CREATE OR ALTER PROCEDURE sp_autorizarPago
     @tarjcodigo VARCHAR(16),
     @monto DECIMAL(18, 2),
     @tarjfecha VARCHAR(5),
