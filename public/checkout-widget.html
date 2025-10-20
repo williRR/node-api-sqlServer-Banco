@@ -104,7 +104,7 @@
     <script>
         const CONFIG = {
             merchantId: 2000,
-            amount: 5.50 ,
+            amount: 5.50,
             currency: 'GTQ'
         };
 
@@ -112,38 +112,43 @@
             document.getElementById('total').textContent = `Q${CONFIG.amount.toFixed(2)}`;
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
-            actualizarTotal();
-            
-            BancoTikalWidget.init({
-                merchantId: CONFIG.merchantId,
-                amount: CONFIG.amount,
-                currency: CONFIG.currency,
+        // ✅ ESPERAR a que el widget se cargue COMPLETAMENTE
+        window.addEventListener('load', function() {
+            // Pequeño delay para asegurar que el script se cargó
+            setTimeout(function() {
+                actualizarTotal();
                 
-                onSuccess: function(paymentData) {
-                    console.log('✅ Pago exitoso:', paymentData);
-                    
-                    if (paymentData.transactionId) {
-                        // Pago con tarjeta completado
-                        alert(`✅ ¡Pago Exitoso!\n\nTransacción: ${paymentData.transactionId}\nMonto: Q${paymentData.amount}\n\n¡Gracias por tu compra!`);
-                        
-                        // Aquí puedes:
-                        // 1. Guardar en tu base de datos
-                        // 2. Enviar email de confirmación
-                        // 3. Redirigir a página de éxito
-                        // window.location.href = `/confirmacion?txn=${paymentData.transactionId}`;
-                        
-                    } else if (paymentData.codigoOrden) {
-                        // Orden de pago generada
-                        alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
-                    }
-                },
-                
-                onError: function(error) {
-                    console.error('❌ Error:', error);
-                    alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
+                // Verificar que BancoTikalWidget existe
+                if (typeof BancoTikalWidget === 'undefined') {
+                    console.error('❌ BancoTikalWidget no se cargó correctamente');
+                    document.getElementById('banco-tikal-widget').innerHTML = 
+                        '<div style="padding: 20px; text-align: center; color: red;">⚠️ Error: Widget no disponible. Intenta recargar la página.</div>';
+                    return;
                 }
-            });
+                
+                console.log('✅ Inicializando widget con:', CONFIG);
+                
+                BancoTikalWidget.init({
+                    merchantId: CONFIG.merchantId,
+                    amount: CONFIG.amount,
+                    currency: CONFIG.currency,
+                    
+                    onSuccess: function(paymentData) {
+                        console.log('✅ Pago exitoso:', paymentData);
+                        
+                        if (paymentData.transactionId) {
+                            alert(`✅ ¡Pago Exitoso!\n\nTransacción: ${paymentData.transactionId}\nMonto: Q${paymentData.amount}\n\n¡Gracias por tu compra!`);
+                        } else if (paymentData.codigoOrden) {
+                            alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
+                        }
+                    },
+                    
+                    onError: function(error) {
+                        console.error('❌ Error:', error);
+                        alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
+                    }
+                });
+            }, 500); // Esperar 500ms para que el widget cargue
         });
     </script>
 </body>

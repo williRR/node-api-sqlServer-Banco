@@ -116,6 +116,24 @@ export const procesarAutorizacion = async (
   }
 };
 
+export async function procesarPagoConTarjeta(paymentData) {
+  try {
+    // Procesar pago
+    const resultado = await procesarAutorizacion(...);
+    
+    if (resultado.status === 'APROBADO') {
+      // ⚠️ COMENTAR WEBHOOKS TEMPORALMENTE
+      // await enviarWebhookAlNegocio(paymentData.merchantId, resultado);
+      console.log('ℹ️ Webhooks deshabilitados (no implementados)');
+    }
+    
+    return resultado;
+  } catch (error) {
+    console.error('💥 Error en procesarPagoConTarjeta:', error.message);
+    throw error;
+  }
+}
+
 export default {
   procesarAutorizacion,
   registerInitialTransaction,
