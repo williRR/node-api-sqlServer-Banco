@@ -11,10 +11,8 @@
     const BancoTikalWidget = {
         version: '2.0.0',
         name: 'Banco Tikal Payment Widget',
-        // ✅ Detectar automáticamente si es local o producción
-        apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:3000/api/v1'  // Local
-            : 'https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1',  // Producción
+        // ✅ SIEMPRE usar la URL de producción (sin detección automática)
+        apiUrl: 'https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1',
         
         config: {
             merchantId: null,
