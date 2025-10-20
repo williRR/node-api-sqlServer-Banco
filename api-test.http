@@ -455,3 +455,156 @@ Content-Type: application/json
 
 ###
 
+###############################################################################
+#                      1️⃣ LOGIN - CLIENTES                                    #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 1.1 Login de Cliente con USERNAME
+### ────────────────────────────────────────────────────────────────────────
+# @name loginClienteUsername
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "PF0809",
+  "password": "0809F7D8"
+}
+
+###
+
+### ────────────────────────────────────────────────────────────────────────
+### 1.2 Login de Cliente con DPI
+### ────────────────────────────────────────────────────────────────────────
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "34567890123456",
+  "password": "0809F7D8"
+}
+
+###
+
+###############################################################################
+#                      2️⃣ LOGIN - NEGOCIOS                                    #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 2.1 Login de Negocio con USERNAME
+### ────────────────────────────────────────────────────────────────────────
+# @name loginNegocioUsername
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "tecnoavanzada",
+  "password": "negocio789"
+}
+
+###
+
+### ────────────────────────────────────────────────────────────────────────
+### 2.2 Login de Negocio con NIT
+### ────────────────────────────────────────────────────────────────────────
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "852147963-2",
+  "password": "CAB15BDE"
+}
+
+###
+
+###############################################################################
+#                   4️⃣ VERIFICACIÓN DE TOKEN                                  #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 4.1 Verificar Token Válido
+### ────────────────────────────────────────────────────────────────────────
+# IMPORTANTE: Primero ejecuta el login (1.1 o 2.1) y copia el token
+POST {{baseUrl}}/auth/verify
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+###
+
+### ────────────────────────────────────────────────────────────────────────
+### 4.2 Verificar Token sin Enviar Token
+### ────────────────────────────────────────────────────────────────────────
+POST {{baseUrl}}/auth/verify
+Content-Type: application/json
+
+###
+
+###############################################################################
+#                   5️⃣ OBTENER PERFIL COMPLETO                                #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 5.1 Obtener Perfil de Cliente (con cuentas y tarjetas)
+### ────────────────────────────────────────────────────────────────────────
+# IMPORTANTE: Primero ejecuta el login de cliente y copia el token
+GET {{baseUrl}}/auth/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+###
+
+### ────────────────────────────────────────────────────────────────────────
+### 5.2 Obtener Perfil de Negocio (con cuentas y tarjetas)
+### ────────────────────────────────────────────────────────────────────────
+# IMPORTANTE: Primero ejecuta el login de negocio y copia el token
+GET {{baseUrl}}/auth/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+###
+
+###############################################################################
+#                   6️⃣ CAMBIAR CONTRASEÑA                                     #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 6.1 Cambiar Contraseña de Cliente - Exitoso
+### ────────────────────────────────────────────────────────────────────────
+# IMPORTANTE: Primero ejecuta el login de cliente y copia el token
+POST {{baseUrl}}/auth/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+{
+  "passwordActual": "CAB15BDE",
+  "passwordNueva": "12345678"
+}
+
+###
+
+### ────────────────────────────────────────────────────────────────────────
+### 6.2 Cambiar Contraseña - Contraseña Actual Incorrecta
+### ────────────────────────────────────────────────────────────────────────
+POST {{baseUrl}}/auth/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+{
+  "passwordActual": "DKFUI",
+  "passwordNueva": "123456789"
+}
+
+###
+
+###############################################################################
+#                   7️⃣ LOGOUT                                                 #
+###############################################################################
+
+### ────────────────────────────────────────────────────────────────────────
+### 7.1 Cerrar Sesión
+### ────────────────────────────────────────────────────────────────────────
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwNCwidXNlcm5hbWUiOiJTb0NBQjE1IiwiZW1haWwiOiJjb250YWN0b0Bzb2x1Y2lvbmVzZGlnaXRhbGVzLmNvbSIsIm5vbWJyZSI6IlNvbHVjaW9uZXMgZGlnaXRhbGVzIFMuQS4iLCJuaXQiOiI4NTIxNDc5NjMtMiIsInRpcG8iOiJuZWdvY2lvIiwiaWF0IjoxNzYwNjc5NDU3LCJleHAiOjE3NjA3NjU4NTd9.lM3r1F9WYLBynBaGsXtDGfgUqYQSah67T--XnOsurGw
+
+###
