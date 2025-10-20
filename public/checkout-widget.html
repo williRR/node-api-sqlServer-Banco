@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Banco Tikal</title>
-    <!-- ✅ Agregar favicon para eliminar error 404 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
     <style>
         * {
@@ -74,26 +73,19 @@
 </head>
 <body>
     <div class="checkout-container">
-        <!-- Encabezado -->
         <div class="checkout-header">
             <h1>🏦 Banco Tikal</h1>
             <p>Pasarela de Pagos Segura</p>
         </div>
 
-        <!-- Cuerpo -->
         <div class="checkout-body">
-            <!-- Total a Pagar -->
             <div class="order-total">
                 <span>Total a Pagar</span>
                 <span id="total">Q0.00</span>
             </div>
 
-            <!-- ============================================ -->
-            <!-- WIDGET DE BANCO TIKAL SE RENDERIZA AQUÍ     -->
-            <!-- ============================================ -->
             <div id="banco-tikal-widget"></div>
 
-            <!-- Badge de Seguridad -->
             <div class="secure-badge">
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
@@ -102,104 +94,57 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             Powered by <strong>Banco Tikal</strong>
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- CARGAR WIDGET DE BANCO TIKAL                 -->
-    <!-- ============================================ -->
     <script src="https://banco-gt-api-aa7d620b23f8.herokuapp.com/widget/banco-payment-widget.js"></script>
 
-    <!-- ============================================ -->
-    <!-- CONFIGURACIÓN DEL WIDGET                     -->
-    <!-- ⭐ AQUÍ CONFIGURAS TU NEGOCIO               -->
-    <!-- ============================================ -->
     <script>
-        // ========================================
-        // ⭐ CONFIGURACIÓN DE TU NEGOCIO
-        // ========================================
         const CONFIG = {
-            merchantId: 2000,        // ← CAMBIAR: Tu ID de negocio en Banco Tikal
-            amount: 5.50,          // ← CAMBIAR: Monto total a cobrar
+            merchantId: 2000,
+            amount: 5.50,
             currency: 'GTQ'
         };
 
-        // ============================
-        // ACTUALIZAR TOTAL
-        // ========================================
         function actualizarTotal() {
             document.getElementById('total').textContent = `Q${CONFIG.amount.toFixed(2)}`;
         }
 
-        // ========================================
-        // INICIALIZAR WIDGET
-        // ========================================
         window.addEventListener('DOMContentLoaded', function() {
-            // Actualizar total visual
             actualizarTotal();
             
-            // Inicializar widget de Banco Tikal
             BancoTikalWidget.init({
                 merchantId: CONFIG.merchantId,
                 amount: CONFIG.amount,
                 currency: CONFIG.currency,
                 
-                // ✅ Cuando el pago es exitoso
                 onSuccess: function(paymentData) {
                     console.log('✅ Pago exitoso:', paymentData);
                     
-                    // Verificar tipo de pago
                     if (paymentData.transactionId) {
-                        // 💳 Pago con tarjeta completado
-                        console.log('Transacción ID:', paymentData.transactionId);
+                        // Pago con tarjeta completado
+                        alert(`✅ ¡Pago Exitoso!\n\nTransacción: ${paymentData.transactionId}\nMonto: Q${paymentData.amount}\n\n¡Gracias por tu compra!`);
                         
-                        // ========================================
-                        // ⭐ AQUÍ PUEDES:
+                        // Aquí puedes:
                         // 1. Guardar en tu base de datos
                         // 2. Enviar email de confirmación
-                        // 3. Actualizar estado de orden
-                        // 4. Redirigir a página de éxito
-                        // ========================================
-                        \n¡Gracias por tu compra!`);
-                        // Ejemplo: Redirigir a página de confirmación
-                        window.location.href = `/confirmacion?txn=${paymentData.transactionId}&amount=${paymentData.amount}`;espués de 3 segundos
+                        // 3. Redirigir a página de éxito
+                        // window.location.href = `/confirmacion?txn=${paymentData.transactionId}`;
                         
                     } else if (paymentData.codigoOrden) {
-                        // 🧾 Orden de pago generada (cliente pagará después)se if (paymentData.codigoOrden) {
-                        console.log('Orden generada:', paymentData.codigoOrden);á después)
-                        n generada:', paymentData.codigoOrden);
-                        // ========================================
-                        // ⭐ AQUÍ PUEDES:
-                        // 1. Guardar orden pendiente
-                        // 2. Enviar código al cliente por email/SMS
-                        // 3. Mostrar instrucciones de pago// 2. Enviar código al cliente por email/SMS
-                        // ========================================
-                           // ========================================
-                        alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);      
-                    }        alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
+                        // Orden de pago generada
+                        alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
+                    }
                 },
                 
-                // ❌ Cuando hay un error
-                onError: function(error) { Cuando hay un error
-                    console.error('❌ Error en pago:', error);
-                    Error en pago:', error);
-                    // ========================================
-                    // ⭐ AQUÍ PUEDES:==============
-                    // 1. Mostrar mensaje personalizado
-                    // 2. Registrar error en logs
-                    // 3. Ofrecer métodos de pago alternativos// 2. Registrar error en logs
-                    // ========================================
-                       // ========================================
-                    alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);     
-                }         alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
-            });   }
-        });     });
-    </script> });
-</body>    </script>
-
-
-</html></body>
+                onError: function(error) {
+                    console.error('❌ Error:', error);
+                    alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
+                }
+            });
+        });
+    </script>
+</body>
 </html>
