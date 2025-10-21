@@ -118,15 +118,34 @@ export const procesarAutorizacion = async (
 
 export async function procesarPagoConTarjeta(paymentData) {
   try {
-    // Procesar pago
-    const resultado = await procesarAutorizacion(...);
-    
+    // Desestructura los datos necesarios
+    const {
+      cardNumber,
+      amount,
+      expDate,
+      cvv,
+      merchantId,
+      emplcodigo = 100,
+      tipocodigo = 2
+    } = paymentData;
+
+    // Llama correctamente a procesarAutorizacion
+    const resultado = await procesarAutorizacion(
+      cardNumber,
+      amount,
+      expDate,
+      cvv,
+      merchantId,
+      emplcodigo,
+      tipocodigo
+    );
+
     if (resultado.status === 'APROBADO') {
       // ⚠️ COMENTAR WEBHOOKS TEMPORALMENTE
       // await enviarWebhookAlNegocio(paymentData.merchantId, resultado);
       console.log('ℹ️ Webhooks deshabilitados (no implementados)');
     }
-    
+
     return resultado;
   } catch (error) {
     console.error('💥 Error en procesarPagoConTarjeta:', error.message);
