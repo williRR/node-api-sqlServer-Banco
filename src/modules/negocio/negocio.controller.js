@@ -10,12 +10,13 @@ export const crearNegocio = async (req, res) => {
     const pool = await getConnection();
     const request = pool.request();
 
-    request.input('nombre', sql.VarChar(50), nombre);
-    request.input('nit', sql.VarChar(11), nit);
-    request.input('ciudad', sql.VarChar(30), ciudad);
-    request.input('direccion', sql.VarChar(50), direccion);
-    request.input('telefono', sql.VarChar(20), telefono || null);
-    request.input('email', sql.VarChar(50), email || null);
+    // ✅ Nombres de parámetros deben coincidir con el SP
+    request.input('negonombre', sql.VarChar(50), nombre);
+    request.input('negnit', sql.VarChar(11), nit);
+    request.input('negociudad', sql.VarChar(30), ciudad);
+    request.input('negodireccion', sql.VarChar(50), direccion);
+    request.input('negotelefono', sql.VarChar(20), telefono || null);
+    request.input('negoemail', sql.VarChar(50), email || null);
 
     const result = await request.execute('sp_crearNegocio');
 
