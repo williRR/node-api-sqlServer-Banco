@@ -8,13 +8,16 @@
 (function() {
     'use strict';
 
+    // Evitar cargar el widget dos veces
+    if (window.BancoTikalWidget) {
+        console.warn('⚠️ BancoTikalWidget ya está cargado');
+        return;
+    }
+
     const BancoTikalWidget = {
-        version: '2.0.0',
+        version: '2.0.1',
         name: 'Banco Tikal Payment Widget',
-        // ✅ Detectar automáticamente si es local o producción
-        apiUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:3000/api/v1'  // Local
-            : 'https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1',  // Producción
+        apiUrl: 'https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1',
         
         config: {
             merchantId: null,
@@ -22,14 +25,13 @@
             currency: 'GTQ',
             onSuccess: null,
             onError: null,
-            paymentMethod: 'card' // 'card' o 'orden'
+            paymentMethod: 'card'
         },
 
         init: function(options) {
             console.log('🏦 Inicializando Banco Tikal Widget v' + this.version);
             console.log('🌐 API URL:', this.apiUrl);
             
-            // Validar configuración
             if (!options.merchantId) {
                 console.error('❌ merchantId es requerido');
                 return;
@@ -40,7 +42,6 @@
                 return;
             }
 
-            // Configurar widget
             this.config = {
                 merchantId: options.merchantId,
                 amount: parseFloat(options.amount),
@@ -49,7 +50,10 @@
                 onError: options.onError || function() {}
             };
 
-            // Renderizar widget
+            // ✅ IMPORTANTE: Inyectar estilos ANTES de renderizar
+            this.injectStyles();
+            
+            // Luego renderizar el widget
             this.render();
         },
 
@@ -172,11 +176,9 @@
                 </div>
             `;
 
-            // Aplicar estilos
-            this.injectStyles();
-
             // Configurar formato de inputs
             this.setupInputFormatting();
+            console.log('✅ Widget renderizado correctamente');
         },
 
         selectMethod: function(method) {
@@ -372,7 +374,13 @@
         },
 
         injectStyles: function() {
-            if (document.getElementById('banco-tikal-styles')) return;
+            // ✅ Verificar si ya se inyectaron los estilos
+            if (document.getElementById('banco-tikal-styles')) {
+                console.log('✅ Estilos ya cargados');
+                return;
+            }
+
+            console.log('📝 Inyectando estilos CSS...');
 
             const styles = document.createElement('style');
             styles.id = 'banco-tikal-styles';
@@ -644,7 +652,9 @@
                     color: #7f8c8d;
                 }
             `;
+            
             document.head.appendChild(styles);
+            console.log('✅ Estilos CSS inyectados correctamente');
         }
     };
 
@@ -652,6 +662,5 @@
     window.BancoTikalWidget = BancoTikalWidget;
 
     console.log('🏦 Banco Tikal Widget cargado exitosamente v' + BancoTikalWidget.version);
-    console.log('🌐 Usando API:', BancoTikalWidget.apiUrl);
 
 })();

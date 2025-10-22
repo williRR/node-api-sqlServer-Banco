@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Banco Tikal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .checkout-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .checkout-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .checkout-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .checkout-header p {
+            opacity: 0.9;
+        }
+        .checkout-body {
+            padding: 30px;
+        }
+        .order-total {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        #banco-tikal-widget {
+            min-height: 400px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <div class="checkout-header">
+            <h1>🏦 Banco Tikal</h1>
+            <p>Pasarela de Pagos Segura</p>
+        </div>
+
+        <div class="checkout-body">
+            <div class="order-total">
+                <span>Total a Pagar</span>
+                <span id="total">Q0.00</span>
+            </div>
+
+            <div id="banco-tikal-widget"></div>
+
+            <div class="secure-badge">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                </svg>
+                <span>Pago Seguro Encriptado</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by <strong>Banco Tikal</strong>
+        </div>
+    </div>
+
+    <script src="https://banco-gt-api-aa7d620b23f8.herokuapp.com/widget/banco-payment-widget.js"></script>
+
+    <script>
+        const CONFIG = {
+            merchantId: 2000,
+            amount: 5.50,
+            currency: 'GTQ'
+        };
+
+        function actualizarTotal() {
+            document.getElementById('total').textContent = `Q${CONFIG.amount.toFixed(2)}`;
+        }
+
+        // ✅ ESPERAR a que el widget se cargue COMPLETAMENTE
+        window.addEventListener('load', function() {
+            // Pequeño delay para asegurar que el script se cargó
+            setTimeout(function() {
+                actualizarTotal();
+                
+                // Verificar que BancoTikalWidget existe
+                if (typeof BancoTikalWidget === 'undefined') {
+                    console.error('❌ BancoTikalWidget no se cargó correctamente');
+                    document.getElementById('banco-tikal-widget').innerHTML = 
+                        '<div style="padding: 20px; text-align: center; color: red;">⚠️ Error: Widget no disponible. Intenta recargar la página.</div>';
+                    return;
+                }
+                
+                console.log('✅ Inicializando widget con:', CONFIG);
+                
+                BancoTikalWidget.init({
+                    merchantId: CONFIG.merchantId,
+                    amount: CONFIG.amount,
+                    currency: CONFIG.currency,
+                    
+                    onSuccess: function(paymentData) {
+                        console.log('✅ Pago exitoso:', paymentData);
+                        
+                        if (paymentData.transactionId) {
+                            alert(`✅ ¡Pago Exitoso!\n\nTransacción: ${paymentData.transactionId}\nMonto: Q${paymentData.amount}\n\n¡Gracias por tu compra!`);
+                        } else if (paymentData.codigoOrden) {
+                            alert(`📝 Orden Generada\n\nCódigo: ${paymentData.codigoOrden}\nClave: ${paymentData.claveAcceso}\n\nGuarda estos datos para completar el pago.`);
+                        }
+                    },
+                    
+                    onError: function(error) {
+                        console.error('❌ Error:', error);
+                        alert(`Error: ${error.message}\n\nIntenta nuevamente o contacta a soporte.`);
+                    }
+                });
+            }, 500); // Esperar 500ms para que el widget cargue
+        });
+    </script>
+</body>
+</html>
