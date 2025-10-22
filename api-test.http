@@ -306,13 +306,13 @@ Content-Type: application/json
 
 ###
 
-# Pagar orden en Heroku
-POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/cliente/102/pagar-orden
+# Pagar orden en local
+POST http://localhost:3000/api/v1/cliente/107/pagar-orden
 Content-Type: application/json
 
 {
-  "codigoOrden": "ORD1234567",
-  "claveAcceso": "8852"
+  "codigoOrden": "ORD0997570",
+  "claveAcceso": "1724"
 }
 
 ### ==============================
@@ -430,7 +430,7 @@ POST http://localhost:3000/api/v1/negocio/2002/generar-orden
 Content-Type: application/json
 
 {
-  "monto": 150.00,
+  "monto": 15.00,
   "concepto": "Pago de prueba negocio 2002",
   "vigenciaHoras": 48
 }
@@ -455,13 +455,3 @@ Content-Type: application/json
 
 ###
 
-POST https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1/pagos/charge
-Content-Type: application/json
-
-{
-  "merchantId": 2000,
-  "cardNumber": "4000007714144690",
-  "amount": 0.75,
-  "expDate": "10/30",
-  "cvv": "551"
-}

@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import sql from 'mssql';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { getConnection } from './config/db.js';
 
 // Configurar __dirname para ES modules
@@ -66,6 +67,16 @@ async function getDbPool() {
 }
 
 // ===== RUTAS =====
+
+// QUITA estas 2 líneas si aún están:
+// const require = createRequire(import.meta.url);
+// const authRoutes = require('./modules/auth/auth.routes.js');
+
+// Usa import ESM:
+import authRoutes from './modules/auth/auth.routes.js';
+
+// Montar rutas de autenticación bajo /api/v1/auth
+app.use('/api/v1/auth', authRoutes);
 
 // Ruta de salud y versión del widget
 app.get('/api/v1/widget/version', (req, res) => {
