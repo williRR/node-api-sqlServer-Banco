@@ -25,7 +25,7 @@ GET {{prod}}/tarjeta/negocio/2002
 
 # Alternativa compatible
 GET {{local}}/negocio/2002/tarjetas
-
+GET {{prod}}/negocio/2002/tarjetas
 
 ###
 # MOVIMIENTOS - Negocio
