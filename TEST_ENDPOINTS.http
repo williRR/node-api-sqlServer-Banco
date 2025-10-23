@@ -1,0 +1,63 @@
+# BASE
+@local = http://localhost:3000/api/v1
+@prod  = https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1
+
+### TARJETAS - Cliente
+# Obtener tarjetas de un cliente (ej: id = 110)
+GET {{local}}/tarjeta/cliente/110
+###
+
+GET {{local}}/tarjeta/cliente/110
+###
+GET {{prod}}/tarjeta/cliente/110
+
+# Alternativa compatible
+GET {{local}}/cliente/110/tarjetas
+GET {{prod}}/cliente/110/tarjetas
+
+###
+# TARJETAS - Negocio
+###
+# Obtener tarjetas asociadas a un negocio (ej: id = 2002)
+GET {{local}}/tarjeta/negocio/2002
+###
+GET {{prod}}/tarjeta/negocio/2002
+
+# Alternativa compatible
+GET {{local}}/negocio/2002/tarjetas
+
+
+###
+# MOVIMIENTOS - Negocio
+###
+# Listar movimientos del negocio (paginado)
+GET {{local}}/negocio/2002/movimientos?limite=10&pagina=2
+
+
+# Ejemplo con otros parámetros
+GET {{local}}/negocio/2002/movimientos?limite=5&pagina=2
+
+
+
+# Probar un pago (simulado)
+POST {{local}}/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": 2002,
+  "cardNumber": "4000007714144690",
+  "amount": 150.50,
+  "expDate": "12/26",
+  "cvv": "123"
+}
+
+POST {{prod}}/pagos/charge
+Content-Type: application/json
+
+{
+  "merchantId": 2002,
+  "cardNumber": "4000007714144690",
+  "amount": 150.50,
+  "expDate": "12/26",
+  "cvv": "123"
+}
