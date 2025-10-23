@@ -4,12 +4,14 @@ import {
   obtenerNegocio,
   actualizarNegocio,
   obtenerDashboard,
-  generarOrdenPago,  // ✅ Debe estar importado
+  generarOrdenPago,
   obtenerOrdenes,
   obtenerIngresos,
   verSaldoNegocio,
   verMovimientosNegocio
 } from "./negocio.controller.js";
+
+import { obtenerTarjetasNegocio } from "../tarjetas/tarjetas.controller.js";
 
 const router = Router();
 
@@ -17,6 +19,10 @@ const router = Router();
 router.post("/", crearNegocio);
 router.get("/:id", obtenerNegocio);
 router.put("/:id", actualizarNegocio);
+
+// Ruta para obtener tarjetas del negocio
+// GET /api/v1/negocio/:id/tarjetas
+router.get("/:id/tarjetas", obtenerTarjetasNegocio);
 
 // ✅ IMPORTANTE: Esta ruta debe existir
 router.post("/:id/generar-orden", generarOrdenPago);
