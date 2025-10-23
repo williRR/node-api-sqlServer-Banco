@@ -2,10 +2,11 @@
 @local = http://localhost:3000/api/v1
 @prod  = https://banco-gt-api-aa7d620b23f8.herokuapp.com/api/v1
 
-###
-# TARJETAS - Cliente
-###
+### TARJETAS - Cliente
 # Obtener tarjetas de un cliente (ej: id = 110)
+GET {{local}}/tarjeta/cliente/110
+###
+
 GET {{local}}/tarjeta/cliente/110
 ###
 GET {{prod}}/tarjeta/cliente/110
@@ -30,19 +31,13 @@ GET {{prod}}/negocio/2002/tarjetas
 # MOVIMIENTOS - Negocio
 ###
 # Listar movimientos del negocio (paginado)
-GET {{local}}/negocio/2002/movimientos?limite=10&pagina=1
-###
-GET {{prod}}/negocio/2002/movimientos?limite=10&pagina=1
+GET {{local}}/negocio/2002/movimientos?limite=10&pagina=2
+
 
 # Ejemplo con otros parámetros
 GET {{local}}/negocio/2002/movimientos?limite=5&pagina=2
-GET {{prod}}/negocio/2002/movimientos?limite=5&pagina=2
 
-###
-# PAGOS / MERCHANTS (útil para probar tarjetas -> merchant existente)
-###
-GET {{local}}/pagos/merchants
-GET {{prod}}/pagos/merchants
+
 
 # Probar un pago (simulado)
 POST {{local}}/pagos/charge
@@ -66,24 +61,3 @@ Content-Type: application/json
   "expDate": "12/26",
   "cvv": "123"
 }
-
-###
-# CURL ejemplos rápidos
-###
-# Obtener tarjetas cliente (local)
-curl -s "{{local}}/tarjeta/cliente/110" | jq .
-
-# Obtener tarjetas negocio (prod)
-curl -s "{{prod}}/negocio/2002/tarjetas" | jq .
-
-# Movimientos negocio (local, página 1)
-curl -s "{{local}}/negocio/2002/movimientos?limite=10&pagina=1" | jq .
-
-# Pago simulado (prod)
-curl -s -X POST "{{prod}}/pagos/charge" -H "Content-Type: application/json" -d '{
-  "merchantId": 2002,
-  "cardNumber": "4000007714144690",
-  "amount": 150.50,
-  "expDate": "12/26",
-  "cvv": "123"
-}' | jq .

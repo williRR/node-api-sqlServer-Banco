@@ -344,34 +344,82 @@ export const verSaldoNegocio = async (req, res) => {
 export const verMovimientosNegocio = async (req, res) => {
   try {
     const { id } = req.params;
-    const { limite = 10, pagina = 1 } = req.query;
+    const { limite = 10, pagina = 1, fechaInicio, fechaFin, sort = 'desc' } = req.query;
+
+    const page = Math.max(parseInt(pagina) || 1, 1);
+    const limit = Math.max(parseInt(limite) || 10, 1);
+    const offset = (page - 1) * limit;
+    const sortDir = (String(sort).toLowerCase() === 'asc') ? 'ASC' : 'DESC';
 
     const pool = await getConnection();
-    const request = pool.request();
 
-    request.input('NegocioID', sql.Int, parseInt(id));
-    request.input('Limite', sql.Int, parseInt(limite));
-    request.input('Offset', sql.Int, (parseInt(pagina) - 1) * parseInt(limite));
+    // Consulta de datos con OFFSET/FETCH
+    const dataRequest = pool.request();
+    dataRequest.input('NegocioID', sql.Int, parseInt(id));
+    dataRequest.input('Limite', sql.Int, limit);
+    dataRequest.input('Offset', sql.Int, offset);
+    if (fechaInicio) dataRequest.input('FechaInicio', sql.Date, fechaInicio);
+    if (fechaFin) dataRequest.input('FechaFin', sql.Date, fechaFin);
 
-    const result = await request.query(`
-      SELECT TOP (@Limite)
+    let dataWhere = 'WHERE c.int_negocodigo = @NegocioID';
+    if (fechaInicio) dataWhere += ' AND CAST(m.dtt_movifecha AS DATE) >= @FechaInicio';
+    if (fechaFin) dataWhere += ' AND CAST(m.dtt_movifecha AS DATE) <= @FechaFin';
+
+    const dataQuery = `
+      SELECT
         m.int_movinumero AS Movimiento,
         m.dtt_movifecha AS Fecha,
         m.dec_moviimporte AS Importe,
         m.int_tipocodigo AS Tipo,
-        m.vch_movitransaccionid AS TransaccionID
+        m.vch_movitransaccionid AS TransaccionID,
+        c.int_cuencodigo AS CuentaID
       FROM Movimiento m
       INNER JOIN Cuenta c ON m.int_cuencodigo = c.int_cuencodigo
-      WHERE c.int_negocodigo = @NegocioID
-      ORDER BY m.dtt_movifecha DESC
-      OFFSET @Offset ROWS
-    `);
+      ${dataWhere}
+      ORDER BY m.dtt_movifecha ${sortDir}
+      OFFSET @Offset ROWS FETCH NEXT @Limite ROWS ONLY
+    `;
+
+    const dataResult = await dataRequest.query(dataQuery);
+
+    // Consulta de totales (conteo + suma)
+    const totalRequest = pool.request();
+    totalRequest.input('NegocioID', sql.Int, parseInt(id));
+    if (fechaInicio) totalRequest.input('FechaInicio', sql.Date, fechaInicio);
+    if (fechaFin) totalRequest.input('FechaFin', sql.Date, fechaFin);
+
+    const totalWhere = dataWhere; // misma condición
+    const totalQuery = `
+      SELECT
+        COUNT(*) AS TotalCount,
+        COALESCE(SUM(m.dec_moviimporte), 0) AS TotalImporte
+      FROM Movimiento m
+      INNER JOIN Cuenta c ON m.int_cuencodigo = c.int_cuencodigo
+      ${totalWhere}
+    `;
+
+    const totalResult = await totalRequest.query(totalQuery);
+    const totals = totalResult.recordset[0] || { TotalCount: 0, TotalImporte: 0 };
+
+    // Formatear movimientos (mapear/limpiar campos si se desea)
+    const movimientos = dataResult.recordset.map(m => ({
+      movimientoNumero: m.Movimiento,
+      fecha: m.Fecha,
+      importe: parseFloat(m.Importe),
+      tipoCodigo: m.Tipo,
+      transaccionId: m.TransaccionID,
+      transaccionIdLast8: m.TransaccionID ? String(m.TransaccionID).slice(-8) : null,
+      cuentaId: m.CuentaID
+    }));
 
     res.json({
       success: true,
       data: {
-        movimientos: result.recordset,
-        total: result.recordset.length
+        movimientos,
+        pagina: page,
+        limite: limit,
+        totalCount: parseInt(totals.TotalCount, 10),
+        totalImporte: parseFloat(totals.TotalImporte)
       }
     });
 
@@ -379,7 +427,8 @@ export const verMovimientosNegocio = async (req, res) => {
     console.error('Error obteniendo movimientos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener movimientos'
+      message: 'Error al obtener movimientos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
