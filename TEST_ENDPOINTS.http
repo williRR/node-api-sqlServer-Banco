@@ -21,11 +21,11 @@ GET {{prod}}/cliente/110/tarjetas
 # Obtener tarjetas asociadas a un negocio (ej: id = 2002)
 GET {{local}}/tarjeta/negocio/2002
 ###
-GET {{prod}}/tarjeta/negocio/2002
+GET {{prod}}/tarjeta/negocio/2000
 
 # Alternativa compatible
 GET {{local}}/negocio/2002/tarjetas
-GET {{prod}}/negocio/2002/tarjetas
+GET {{prod}}/negocio/2000/tarjetas
 
 ###
 # MOVIMIENTOS - Negocio

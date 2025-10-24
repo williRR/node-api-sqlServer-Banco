@@ -7,7 +7,7 @@ BASE_URL="https://banco-gt-api-aa7d620b23f8.herokuapp.com"
 
 echo "1️⃣ Obteniendo lista de merchants válidos..."
 echo ""
-
+ 
 # Obtener merchants válidos
 MERCHANTS_RESPONSE=$(curl -s "$BASE_URL/api/v1/pagos/merchants")
 echo "📋 Merchants disponibles:"
