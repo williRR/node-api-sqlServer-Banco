@@ -154,12 +154,12 @@ POST {{baseUrl}}/negocio
 Content-Type: application/json
 
 {
-  "nombre": "Café La Esquina",
-  "nit": "12345678-12",
+  "nombre": "Banco Tikal S.A.",
+  "nit": "12345678-21",
   "ciudad": "Guatemala",
   "direccion": "5a Avenida 10-20, Zona 1",
-  "telefono": "22345678",
-  "email": "info@cafelaesquina.com"
+  "telefono": "59919999",
+  "email": "info@bancotikal.com"
 }
 
 ### 3.2 Obtener Negocio por ID
@@ -242,10 +242,10 @@ Content-Type: application/json
 
 {
   "merchantId": 2002,
-  "cardNumber": "4000007714144690",
+  "cardNumber": "4000003190164825",
   "amount": 250.50,
   "expDate": "10/30",
-  "cvv": "551"
+  "cvv": "731"
 }
 
 ### 4.3 Pago con Tarjeta VISA

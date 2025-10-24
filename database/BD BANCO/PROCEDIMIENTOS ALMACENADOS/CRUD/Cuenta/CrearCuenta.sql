@@ -39,7 +39,7 @@ BEGIN
         -- Genera un usuario pseudoaleatorio de 8 caracteres
         SET @cuenusuario = LEFT(REPLACE(CAST(NEWID() AS VARCHAR(50)), '-', ''), 8);
 
-        -- Genera una clave numérica pseudoaleatoria de 6 dígitos
+        -- Genera una clave numï¿½rica pseudoaleatoria de 6 dï¿½gitos
         SET @cuenclave = RIGHT('000000' + CAST(ABS(CHECKSUM(NEWID())) % 1000000 AS VARCHAR(6)), 6);
 
       
@@ -66,13 +66,13 @@ BEGIN
             @cuenclave
         );
 
-        -- Opcional: obtener el código de la nueva cuenta
+        -- Opcional: obtener el cï¿½digo de la nueva cuenta
         DECLARE @NewAccountID INT;
         SET @NewAccountID = SCOPE_IDENTITY();
 
         COMMIT TRANSACTION;
 
-        -- Devolver la información para la aplicación
+        -- Devolver la informaciï¿½n para la aplicaciï¿½n
         SELECT
             @NewAccountID AS CodigoCuenta,
 

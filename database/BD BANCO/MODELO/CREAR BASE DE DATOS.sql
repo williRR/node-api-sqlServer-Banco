@@ -263,14 +263,15 @@ CREATE TABLE PagoExterno (
 );
 GO
 
+
 CREATE TABLE Auditoria (
     int_auditid INT IDENTITY PRIMARY KEY,
-    vch_accion VARCHAR(50) NOT NULL,
+    vch_accion VARCHAR(50) NOT NULL, INSERTAR, ACTUALIZAR, ELIMINAR
     vch_usuario VARCHAR(20) NOT NULL,
     dtt_fechahora DATETIME NOT NULL DEFAULT GETDATE(),
     vch_detalle VARCHAR(200) NULL
 );
-GO
+GO 
 
 use Banco
 -- Crear la tabla TransaccionPasarela
@@ -281,7 +282,7 @@ CREATE TABLE TransaccionPasarela (
     -- 2. Detalles de la Transaccin
     vch_merchantid VARCHAR(50) NOT NULL,
     dec_monto DECIMAL(18, 2) NOT NULL,
-    vch_moneda VARCHAR(3) NOT NULL DEFAULT 'USD', -- Moneda de la transaccin
+    vch_moneda VARCHAR(3) NOT NULL DEFAULT 'gtq', -- Moneda de la transaccin
     
     -- 3. Tiempos
     dtt_fechahora DATETIME NOT NULL DEFAULT GETDATE(), -- Fecha de registro inicial
