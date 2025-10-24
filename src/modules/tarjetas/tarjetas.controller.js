@@ -1,13 +1,30 @@
 import { getConnection } from "../../config/db.js";
 import sql from "mssql";
+import * as tarjetaService from "./tarjetas.services.js"; // <-- import del servicio
 
 export const crearTarjeta = async (req, res) => {
   try {
     const data = req.body;
-    const nuevaTarjeta = await tarjetaService.crearTarjeta(data);
-    res.status(201).json(nuevaTarjeta);
+
+    // Validaciones mínimas
+    if (!data || !data.cuencodigo) {
+      return res.status(400).json({ success: false, message: "Parámetros requeridos: cuencodigo" });
+    }
+
+    // Llamar al servicio que ejecuta el SP y devuelve la tarjeta creada
+    const nuevaTarjeta = await tarjetaService.crearTarjeta({
+      cuencodigo: parseInt(data.cuencodigo, 10)
+      // ...puedes pasar otros campos si el SP los requiere...
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Tarjeta creada exitosamente",
+      data: nuevaTarjeta
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear tarjeta', error: error.message });
+    console.error("Error al crear tarjeta (controller):", error.message);
+    return res.status(500).json({ success: false, message: "Error interno al crear tarjeta" });
   }
 };
 
